@@ -22,17 +22,15 @@ import javax.print.attribute.standard.DateTimeAtCompleted;
  */
 public class Setup 
 {
-    // mensaje que se va desplegar al usuario con la información de la memoria restante 
-    final static String versionMessage = "MINGOSOFT ® MIDOS \n" +
-                            "© Copyright MINGOSOFT CORPORATION 2018\n" +
-                            "Versión 1.0 Memoria libre: {0} K Autor: Carlos - Cédula\n" +
-                            "M:\\ _";
+    static int freeStorage = 0;
     
     // almacena los mensajes de error
     static ArrayList <ErrorMessage> errorMessagesList = new ArrayList<ErrorMessage>();
     
     // almacena los comandos permitidos
     static ArrayList <Command> commandsList = new ArrayList<Command>();
+    
+    static boolean exit = false;
     
     public static void main (String [] args) throws IOException
     {
@@ -47,13 +45,22 @@ public class Setup
         LoadCommands();
         
         // se debe repetir hasta que el usuario desee salir mediante el comando EXIT
+        do 
+        {
+            optionEntered = "";
+            
+            DisplayVersion();
+       
+            optionEntered = scanner.next();
         
-        System.out.print(versionMessage);
-        optionEntered = scanner.next();
         
+            // se verifica si el texto ingresado corresponde a un comando
+            informationCode = CheckCommand(optionEntered);
         
-        // se verifica si el texto ingresado corresponde a un comando
-        informationCode = CheckCommand(optionEntered);
+        } 
+        while (exit);
+        
+    
         
         
         
@@ -70,6 +77,9 @@ public class Setup
     {
         commandsList.add(new Command(COMMAND_TYPE.CLS, "^CLS|cls$", "Permite limpiar la pantalla de la consola"));
         commandsList.add(new Command(COMMAND_TYPE.DATE, "^DATE|date", "Despliega la fecha del sistema"));
+        commandsList.add(new Command(COMMAND_TYPE.VER, "^VER|ver", "Despliega la versión y espacio libre del sistema"));
+        commandsList.add(new Command(COMMAND_TYPE.EXIT, "^EXIT|exit$", "Finaliza el programa"));
+        
         
     }
     
@@ -99,9 +109,11 @@ public class Setup
                         break;
                         
                     case VER:
+                        DisplayVersion();
                         break;
                         
                     case EXIT:
+                        Exit();
                         break;
                 }
             }
@@ -126,5 +138,47 @@ public class Setup
         Date currentDate = Calendar.getInstance().getTime();
 
         System.out.println(new SimpleDateFormat("dd/MM/yyyy").format(currentDate));
+    }
+    
+    private static void DisplayVersion()
+    {
+        // mensaje que se va desplegar al usuario con la información de la memoria restante 
+        final String versionMessage = "MINGOSOFT ® MIDOS \n" +
+                            "© Copyright MINGOSOFT CORPORATION 2018\n" +
+                            "Versión 1.0 Memoria libre: %d K Autor: Carlos - Cédula\n" +
+                            "M:\\ _";
+    
+         System.out.print(String.format(versionMessage, freeStorage));
+    }
+    
+    private static void Exit()
+    {
+        Scanner scanner = new Scanner(System.in);
+        boolean stopAskingCorrectOption = false;
+        
+        do 
+        {
+             // se verifica si desea salir del sistema
+            System.out.print("¿Está seguro que desea salir de MIDOS (S/N) ?");
+
+            String selectedOption = scanner.next();
+
+            if (selectedOption.equalsIgnoreCase("S")) 
+            {
+                System.out.println("El programa va finalizar\n¡Te esperamos de vuelta pronto!");
+                exit = false;
+                stopAskingCorrectOption = false;
+            }
+            else
+            {
+                if (!selectedOption.equalsIgnoreCase("N")) 
+                {
+                    System.out.println("Verifique la opción ingresada, sólo se permite (S para si/N para no)");
+                    stopAskingCorrectOption = true;
+                } 
+            }
+        } 
+        while (stopAskingCorrectOption);
+
     }
 }
