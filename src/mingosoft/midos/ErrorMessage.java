@@ -12,20 +12,20 @@ package mingosoft.midos;
 public class ErrorMessage 
 {
     
-    private int code;
+    private INFORMATION_CODE code;
     private String description;
 
-    public ErrorMessage(int code, String description) {
+    public ErrorMessage(INFORMATION_CODE code, String description) {
         this.code = code;
         this.description = description;
     }
     
 
-    public int getCode() {
+    public INFORMATION_CODE getCode() {
         return code;
     }
 
-    public void setCode(int code) {
+    public void setCode(INFORMATION_CODE code) {
         this.code = code;
     }
 
