@@ -76,8 +76,9 @@ public class Setup
     private static void LoadCommands()
     {
         commandsList.add(new Command(COMMAND_TYPE.CLS, "^CLS|cls$", "Permite limpiar la pantalla de la consola"));
-        commandsList.add(new Command(COMMAND_TYPE.DATE, "^DATE|date", "Despliega la fecha del sistema"));
-        commandsList.add(new Command(COMMAND_TYPE.VER, "^VER|ver", "Despliega la versión y espacio libre del sistema"));
+        commandsList.add(new Command(COMMAND_TYPE.DATE, "^DATE|date$", "Despliega la fecha del sistema"));
+        commandsList.add(new Command(COMMAND_TYPE.TIME, "^TIME|time$", "Despliega la hora del sistema"));
+        commandsList.add(new Command(COMMAND_TYPE.VER, "^VER|ver$", "Despliega la versión y espacio libre del sistema"));
         commandsList.add(new Command(COMMAND_TYPE.EXIT, "^EXIT|exit$", "Finaliza el programa"));
         
         
@@ -102,12 +103,13 @@ public class Setup
                         DisplayDate();
                         break;
                         
+                    case TIME:
+                        DisplayTime();
+                        break;
+                        
                     case MD:
                         break;
-                        
-                    case TIME:
-                        break;
-                        
+                
                     case VER:
                         DisplayVersion();
                         break;
@@ -135,9 +137,16 @@ public class Setup
     
     private static void DisplayDate()
     {
-        Date currentDate = Calendar.getInstance().getTime();
+        Date currentTime = Calendar.getInstance().getTime();
 
-        System.out.println(new SimpleDateFormat("dd/MM/yyyy").format(currentDate));
+        System.out.println(new SimpleDateFormat("dd/MM/yyyy").format(currentTime));
+    }
+    
+    private static void DisplayTime()
+    {
+        Date currentTime = Calendar.getInstance().getTime();
+
+        System.out.println(new SimpleDateFormat("HH:mm:ss").format(currentTime));
     }
     
     private static void DisplayVersion()
