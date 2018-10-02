@@ -66,7 +66,7 @@ public class Setup
 
 
             // se verifica si el texto ingresado corresponde a un comando
-            informationCode = CheckCommand(optionEntered);
+            CheckCommand(optionEntered);
 
         } 
         while (!exit);
@@ -89,6 +89,19 @@ public class Setup
         commandsList.add(new Command(COMMAND_TYPE.VER, "^VER$|^ver$", "Despliega la versión y espacio libre del sistema"));
         commandsList.add(new Command(COMMAND_TYPE.EXIT, "^EXIT$|^exit$", "Finaliza el programa"));
         
+    }
+    
+    private static String GetErrorMessage(INFORMATION_CODE informationCode)
+    {
+        for (ErrorMessage errorMessage : errorMessagesList) 
+        {
+            if (errorMessage.getCode() == informationCode) 
+            {
+                return errorMessage.getDescription();
+            }
+        }
+        
+        return "";
     }
     
     private static void LoadStorage()
@@ -224,13 +237,16 @@ public class Setup
         return false;
     }
     
-    private static INFORMATION_CODE CheckCommand(String commandToSearch)
+    private static void CheckCommand(String commandToSearch)
     {
+        boolean isValidCommand = false;
         
         for (Command command : commandsList)
         {
             if (commandToSearch.matches(command.getPatternAccepted())) 
             {
+                isValidCommand = true;
+                
                 // comando encontrado
                 switch(command.getCommandType())
                 {
@@ -258,12 +274,18 @@ public class Setup
                     case EXIT:
                         Exit();
                         break;
+                        
+                    
                 }
             }
+            
         }
         
-        // comando inválido
-        return INFORMATION_CODE.NOT_VALID_OPTION;
+        if (!isValidCommand) 
+        {
+            System.out.println(GetErrorMessage(INFORMATION_CODE.COMMAND_NOT_FOUND));
+        }
+       
     }
     
     private static void ClearScreen()
@@ -321,7 +343,7 @@ public class Setup
         // mensaje que se va desplegar al usuario con la información de la memoria restante 
         final String versionMessage = "\nMINGOSOFT ® MIDOS \n" +
                             "© Copyright MINGOSOFT CORPORATION 2018\n" +
-                            "Versión 1.0 Memoria libre: %d K Autor: Carlos - Cédula\n" +
+                            "Versión 1.0 Memoria libre: %d K Autor: Carlos Castro Brenes - Cédula: 1-1596-0319\n" +
                             "M:\\ _";
     
          System.out.print(String.format(versionMessage, TOTAL_STORAGE));
