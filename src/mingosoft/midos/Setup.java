@@ -7,14 +7,19 @@ package mingosoft.midos;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 import java.util.Scanner;
 
 /**
@@ -36,7 +41,9 @@ public class Setup
     
     // almacena los comandos permitidos
     static ArrayList <Command> commandsList = new ArrayList<Command>();
-    static ArrayList <String> directoriesList = new ArrayList<String>();
+    
+    // almacena los directorios y archivos que se van creando
+    static ArrayList <Item> items = new ArrayList<Item>();
     
     static boolean exit = false;
     
@@ -53,7 +60,7 @@ public class Setup
         LoadCommands();
        
         LoadStorage();
-        LoadDirectories();
+        LoadItems();
 
         // se debe repetir hasta que el usuario desee salir mediante el comando EXIT
         do 
@@ -160,54 +167,47 @@ public class Setup
         }
     }
     
-    private static void LoadDirectories()
+    private static void LoadItems()
     {
         try 
         {
             
-            // Se indica el archivo con el que se desea trabajar
-            File file = new File (DIRECTORIES_FILE);
-
-            FileReader fileReader = new FileReader (file);
-
-            BufferedReader bufferedReader = new BufferedReader(fileReader);
-
-            // permite almacenar los datos que se van leyendo
-            String readedData;
-
-            while((readedData = bufferedReader.readLine()) != null)
-            {
-                directoriesList.add(readedData.trim());
-            }
-                    
-            fileReader.close();
+             // Se indica el archivo con el que se desea trabajar
+            FileInputStream file = new FileInputStream(DIRECTORIES_FILE);
+            ObjectInputStream objectInputStream = new ObjectInputStream(file);
+            items = (ArrayList<Item>) objectInputStream.readObject();
+            objectInputStream.close();
+     
  
         } 
         catch (IOException e) 
         {
-            System.out.println("Ha ocurrido un error al cargar el almacenamiento disponible");
+            System.out.println("Ha ocurrido un error al cargar los directorios creados");
         }
-        catch (NumberFormatException e)
+        catch (ClassNotFoundException e)
         {
             System.out.println("El archivo de almacenamiento de memoria contiene información en un formato no reconocido");
         }
     }
     
-    private static void WriteDirectory(String name)
+    private static void WriteItem(String name)
     {
         try 
         {
+            
+            // se agrega el directorio, de momento sólo se van a manejar directorios
+            items.add(new Item(name, ItemType.DIRECTORY));
+
             // se indica el archivo con el que se va trabajar y que trunque los datos para que siempre escriba la cantidad de espacio disponible
             // al inicio del archivo
-            FileWriter fileWriter = new FileWriter(DIRECTORIES_FILE, true);
-
-            PrintWriter	printWriter = new PrintWriter(fileWriter);
-
-            // se escribe el directorio en el archivo
-            printWriter.println(name);
+            FileOutputStream file = new FileOutputStream(DIRECTORIES_FILE, false);
+            ObjectOutputStream objectOutput = new ObjectOutputStream(file);
             
-            fileWriter.close();
+             // se escribe el directorio en el archivo
+            objectOutput.writeObject(items);
             
+            objectOutput.close();
+
         } 
         catch (IOException e) 
         {
@@ -217,15 +217,18 @@ public class Setup
     
     private static void ListDirectories()
     {
-        for (String currentFolder : directoriesList) 
+        /*
+        for (String currentFolder : items) 
         {
             System.out.println(currentFolder);
         }
+        */
     }
     
     private static boolean SearchDirectory(String name)
     {
-        for (String currentFolder : directoriesList) 
+        /*
+        for (Item currentFolder : items) 
         {
             // se verifica si el nombre hace match
             if (name.equalsIgnoreCase(currentFolder)) 
@@ -233,6 +236,7 @@ public class Setup
                 return true;
             }
         }
+*/
         
         return false;
     }
@@ -264,7 +268,7 @@ public class Setup
                         break;
                         
                     case MD:
-                        MakeDirectory(commandToSearch.split("\\s+")[1]);
+                        MakeItem(commandToSearch.split("\\s+")[1]);
                         break;
                 
                     case VER:
@@ -312,7 +316,7 @@ public class Setup
         System.out.println(new SimpleDateFormat("HH:mm:ss").format(currentTime));
     }
     
-    private static void MakeDirectory(String name)
+    private static void MakeItem(String name)
     {
         // se verifica si hay espacio disponible para crear el directorio, cada uno ocupa 8k
         if (TOTAL_STORAGE >= 8) 
@@ -326,8 +330,7 @@ public class Setup
             {
                 
                 TOTAL_STORAGE -= 8;
-                WriteDirectory(name);
-                directoriesList.add(name.trim());
+                WriteItem(name);
                 WriteStorage();
                 System.out.println("El directorio se ha creado exitosamente");
             }    
