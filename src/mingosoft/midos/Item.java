@@ -7,6 +7,7 @@ package mingosoft.midos;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Objects;
 
 /**
  *
@@ -56,5 +57,36 @@ public class Item implements Serializable
         this.items = items;
     }
 
+    @Override
+    public int hashCode() {
+        int hash = 5;
+        hash = 29 * hash + Objects.hashCode(this.name);
+        return hash;
+    }
+
+    
+    @Override
+    public boolean equals(Object obj) {
+        
+        if (this == obj) {
+            return true;
+        }
+        
+        if (obj == null) {
+            return false;
+        }
+        
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        
+        final Item receivedItem = (Item) obj;
+        
+        return Objects.equals(this.name, receivedItem.name);
+    }
+
+    
+
+    
     
 }

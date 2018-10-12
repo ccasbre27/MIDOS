@@ -91,12 +91,14 @@ public class Setup
         commandsList.add(new Command(COMMAND_TYPE.CLS, "^CLS$|^cls$", "Permite limpiar la pantalla de la consola"));
         commandsList.add(new Command(COMMAND_TYPE.DATE, "^DATE$|^date$", "Despliega la fecha del sistema"));
         commandsList.add(new Command(COMMAND_TYPE.TIME, "^TIME$|^time$", "Despliega la hora del sistema"));
-        commandsList.add(new Command(COMMAND_TYPE.MD, "MD [a-zA-Z]{1,}[a-zA-Z0-9]{0,7}|md [a-zA-Z]{1,}[a-zA-Z0-9]{0,7}", "Crea un directorio en la raíz donde se encuentra"));
+        commandsList.add(new Command(COMMAND_TYPE.MD, "MD [a-zA-Z]{1,}[a-zA-Z0-9]{0,7}|md [a-zA-Z]{1,}[a-zA-Z0-9]{0,7}", "Crea un directorio en la ruta actual"));
         commandsList.add(new Command(COMMAND_TYPE.VER, "^VER$|^ver$", "Despliega la versión y espacio libre del sistema"));
         commandsList.add(new Command(COMMAND_TYPE.DIR, "^DIR$|^dir$", "Lista los archivos y directorios que hay en la dirección actual"));
+        commandsList.add(new Command(COMMAND_TYPE.RD, "RD [a-zA-Z]{1,}[a-zA-Z0-9]{0,7}|rd [a-zA-Z]{1,}[a-zA-Z0-9]{0,7}", "Elimina un archivo o directorio con el nombre indicado en la ruta actual"));
         commandsList.add(new Command(COMMAND_TYPE.EXIT, "^EXIT$|^exit$", "Finaliza el programa"));
         
     }
+    
     
     private static String GetErrorMessage(INFORMATION_CODE informationCode)
     {
@@ -109,6 +111,65 @@ public class Setup
         }
         
         return "";
+    }
+    
+       private static void CheckCommand(String commandToSearch)
+    {
+        boolean isValidCommand = false;
+        
+        for (Command command : commandsList)
+        {
+            if (commandToSearch.matches(command.getPatternAccepted())) 
+            {
+                isValidCommand = true;
+                
+                // comando encontrado
+                switch(command.getCommandType())
+                {
+                    case CLS:
+                        // se simula un limpiado de pantalla con 10 líneas en blanco
+                        ClearScreen();
+                        break;
+                        
+                    case DATE:
+                        DisplayDate();
+                        break;
+                        
+                    case TIME:
+                        DisplayTime();
+                        break;
+                        
+                    case MD:
+                        MakeItem(commandToSearch.split("\\s+")[1]);
+                        break;
+                
+                    case VER:
+                        DisplayVersion();
+                        break;
+                        
+                    case DIR:
+                        ListDirectories(items, "\t");
+                        break;
+                        
+                    case RD:
+                        RemoveDirectory(commandToSearch.split("\\s+")[1]);
+                        break;
+                        
+                    case EXIT:
+                        Exit();
+                        break;
+                        
+                    
+                }
+            }
+            
+        }
+        
+        if (!isValidCommand) 
+        {
+            System.out.println(GetErrorMessage(INFORMATION_CODE.COMMAND_NOT_FOUND));
+        }
+       
     }
     
     private static void LoadStorage()
@@ -190,13 +251,12 @@ public class Setup
         }
     }
     
-    private static void WriteItem(String name)
+    private static void WriteItems()
     {
         try 
         {
             
-            // se agrega el directorio, de momento sólo se van a manejar directorios
-            items.add(new Item(name, ItemType.DIRECTORY));
+            
 
             // se indica el archivo con el que se va trabajar y que trunque los datos para que siempre escriba la cantidad de espacio disponible
             // al inicio del archivo
@@ -246,61 +306,7 @@ public class Setup
         return false;
     }
     
-    private static void CheckCommand(String commandToSearch)
-    {
-        boolean isValidCommand = false;
-        
-        for (Command command : commandsList)
-        {
-            if (commandToSearch.matches(command.getPatternAccepted())) 
-            {
-                isValidCommand = true;
-                
-                // comando encontrado
-                switch(command.getCommandType())
-                {
-                    case CLS:
-                        // se simula un limpiado de pantalla con 10 líneas en blanco
-                        ClearScreen();
-                        break;
-                        
-                    case DATE:
-                        DisplayDate();
-                        break;
-                        
-                    case TIME:
-                        DisplayTime();
-                        break;
-                        
-                    case MD:
-                        MakeItem(commandToSearch.split("\\s+")[1]);
-                        break;
-                
-                    case VER:
-                        DisplayVersion();
-                        break;
-                        
-                    case DIR:
-                        ListDirectories(items, "\t");
-                        break;
-                        
-                    case EXIT:
-                        Exit();
-                        break;
-                        
-                    
-                }
-            }
-            
-        }
-        
-        if (!isValidCommand) 
-        {
-            System.out.println(GetErrorMessage(INFORMATION_CODE.COMMAND_NOT_FOUND));
-        }
-       
-    }
-    
+ 
     private static void ClearScreen()
     {
         for (int i = 0; i < 10; i++) 
@@ -339,7 +345,11 @@ public class Setup
             {
                 
                 TOTAL_STORAGE -= 8;
-                WriteItem(name);
+                
+                // se agrega el directorio, de momento sólo se van a manejar directorios
+                items.add(new Item(name, ItemType.DIRECTORY));
+                
+                WriteItems();
                 WriteStorage();
                 System.out.println("El directorio se ha creado exitosamente");
             }    
@@ -347,6 +357,31 @@ public class Setup
         else    
         {
             System.out.println("No hay espacio disponible para crear el directorio");
+        }
+    }
+    
+    private static void RemoveDirectory(String name)
+    {
+        // revisamos que el directorio exista
+        if (SearchDirectory(name))
+        {
+            // una vez que se ha encontrado vamos a proceder a obtener la referencia a él
+            items.remove(new Item(name, ItemType.FILE));
+            
+            // se escribe el estado actual de los directorios
+            WriteItems();
+            
+            // se suma el espacio eliminado
+            TOTAL_STORAGE += 8;
+            
+            // se actualiza el espacio en memoria
+            WriteStorage();
+            
+            System.out.println("El directorio se ha eliminado exitosamente");
+        }
+        else
+        {
+            System.out.println("No se ha encontrado el archivo o directorio indicado");
         }
     }
     
