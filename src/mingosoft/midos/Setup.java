@@ -19,7 +19,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.List;
 import java.util.Scanner;
 
 /**
@@ -94,6 +93,7 @@ public class Setup
         commandsList.add(new Command(COMMAND_TYPE.TIME, "^TIME$|^time$", "Despliega la hora del sistema"));
         commandsList.add(new Command(COMMAND_TYPE.MD, "MD [a-zA-Z]{1,}[a-zA-Z0-9]{0,7}|md [a-zA-Z]{1,}[a-zA-Z0-9]{0,7}", "Crea un directorio en la raíz donde se encuentra"));
         commandsList.add(new Command(COMMAND_TYPE.VER, "^VER$|^ver$", "Despliega la versión y espacio libre del sistema"));
+        commandsList.add(new Command(COMMAND_TYPE.DIR, "^DIR$|^dir$", "Lista los archivos y directorios que hay en la dirección actual"));
         commandsList.add(new Command(COMMAND_TYPE.EXIT, "^EXIT$|^exit$", "Finaliza el programa"));
         
     }
@@ -215,28 +215,33 @@ public class Setup
         }
     }
     
-    private static void ListDirectories()
+    private static void ListDirectories(ArrayList<Item> itemsToSearch, String space)
     {
-        /*
-        for (String currentFolder : items) 
+        
+        for (Item currentItem : itemsToSearch) 
         {
-            System.out.println(currentFolder);
+             System.out.println(space + currentItem.getName());
+             
+             if(currentItem.items.size() > 0)
+             {
+                ListDirectories(currentItem.items, space + space);
+             }
         }
-        */
+        
     }
     
     private static boolean SearchDirectory(String name)
     {
-        /*
-        for (Item currentFolder : items) 
+        
+        for (Item currentItem : items) 
         {
             // se verifica si el nombre hace match
-            if (name.equalsIgnoreCase(currentFolder)) 
+            if (name.equalsIgnoreCase(currentItem.getName())) 
             {
                 return true;
             }
         }
-*/
+
         
         return false;
     }
@@ -273,6 +278,10 @@ public class Setup
                 
                     case VER:
                         DisplayVersion();
+                        break;
+                        
+                    case DIR:
+                        ListDirectories(items, "\t");
                         break;
                         
                     case EXIT:
