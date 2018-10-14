@@ -41,8 +41,7 @@ public class Setup
     // almacena los comandos permitidos
     static ArrayList <Command> commandsList = new ArrayList<Command>();
     
-    // almacena los directorios y archivos que se van creando
-    static Item homeItem = new Item();
+    // indica el directorio actual
     static Item currentItem = new Item();
     
     static String path = "M:\\";
@@ -155,7 +154,7 @@ public class Setup
                         break;
                         
                     case DIR:
-                        ListDirectories(currentItem.nextItems, "\t");
+                        ListDirectories();
                         break;
                         
                     case RD:
@@ -209,6 +208,8 @@ public class Setup
         catch (IOException e) 
         {
             System.out.println("Ha ocurrido un error al cargar el almacenamiento disponible");
+            
+            TOTAL_STORAGE = 256;
         }
         catch (NumberFormatException e)
         {
@@ -248,7 +249,6 @@ public class Setup
             FileInputStream file = new FileInputStream(DIRECTORIES_FILE);
             ObjectInputStream objectInputStream = new ObjectInputStream(file);
             currentItem = (Item) objectInputStream.readObject();
-            homeItem = currentItem;
             objectInputStream.close();
      
  
@@ -284,20 +284,16 @@ public class Setup
         }
     }
     
-    private static void ListDirectories(ArrayList<Item> itemsToSearch, String space)
+    private static void ListDirectories()
     {
          // se verifica si  hay directorios para listar
-        if (itemsToSearch.size() > 0)
+        if (currentItem.nextItems.size() > 0)
         {
             // si es así los listamos
-            for (Item item : itemsToSearch) 
+            for (Item item : currentItem.nextItems) 
             {
-                System.out.println(space + item.getName());
+                System.out.println("\t" + item.getName());
 
-                if(item.nextItems.size() > 0)
-                {
-                    ListDirectories(item.nextItems, space + space);
-                }
             }
         }
         else
@@ -367,7 +363,7 @@ public class Setup
             }
             else
             {
-                
+                // cantidad de bytes que ocupan los directorios
                 TOTAL_STORAGE -= 8;
                 
                 // se agrega el directorio, de momento sólo se van a manejar directorios
@@ -404,13 +400,13 @@ public class Setup
       
                 // buscamos la posición en la que está el nombre del directorio
                 int lastBackslashPosition = path.indexOf(currentItem.getName());
+                
+                // actualizamos el path
                 path = path.substring(0, lastBackslashPosition);
                
                 // si no es nulo navegamos hacia él
                 currentItem = currentItem.previousItem;
-                
-                 // actualizamos el path
-                        
+                    
             }
             else
             {
@@ -421,6 +417,8 @@ public class Setup
         {
             // se quiere navegar al directorio padre
             currentItem = GetRootDirectory(currentItem);
+            
+            path = "M:\\";
         }
         else
         {
