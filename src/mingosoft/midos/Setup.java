@@ -36,13 +36,16 @@ public class Setup
     
     
     // almacena los mensajes de error
-    static ArrayList <ErrorMessage> errorMessagesList = new ArrayList<ErrorMessage>();
+    static ArrayList <InformationMessage> informationMessagesList = new ArrayList<InformationMessage>();
     
     // almacena los comandos permitidos
     static ArrayList <Command> commandsList = new ArrayList<Command>();
     
     // almacena los directorios y archivos que se van creando
-    static ArrayList <Item> items = new ArrayList<Item>();
+    static Item homeItem = new Item();
+    static Item currentItem = new Item();
+    
+    static String path = "M:\\";
     
     static boolean exit = false;
     
@@ -81,9 +84,10 @@ public class Setup
     
     private static void LoadErrorMessages()
     {
-        errorMessagesList.add(new ErrorMessage(INFORMATION_CODE.COMMAND_NOT_FOUND, "Comando inválido"));
-        errorMessagesList.add(new ErrorMessage(INFORMATION_CODE.NOT_VALID_OPTION, "Opción inválida"));
-        errorMessagesList.add(new ErrorMessage(INFORMATION_CODE.DUPLICATE_DIRECTORY, "Ya existe un directorio con ese nombre: nombre del directorio"));
+        informationMessagesList.add(new InformationMessage(INFORMATION_CODE.COMMAND_NOT_FOUND, "001", "Comando inválido"));
+        informationMessagesList.add(new InformationMessage(INFORMATION_CODE.NOT_VALID_OPTION, "002", "Opción inválida"));
+        informationMessagesList.add(new InformationMessage(INFORMATION_CODE.DUPLICATE_DIRECTORY, "003", "Ya existe un directorio con ese nombre: nombre del directorio"));
+        informationMessagesList.add(new InformationMessage(INFORMATION_CODE.EMPTY_DIRECTORY, "004", "La carpeta se encuentra vacía"));
     }
     
     private static void LoadCommands()
@@ -92,6 +96,7 @@ public class Setup
         commandsList.add(new Command(COMMAND_TYPE.DATE, "^DATE$|^date$", "Despliega la fecha del sistema"));
         commandsList.add(new Command(COMMAND_TYPE.TIME, "^TIME$|^time$", "Despliega la hora del sistema"));
         commandsList.add(new Command(COMMAND_TYPE.MD, "MD [a-zA-Z]{1,}[a-zA-Z0-9]{0,7}|md [a-zA-Z]{1,}[a-zA-Z0-9]{0,7}", "Crea un directorio en la ruta actual"));
+        commandsList.add(new Command(COMMAND_TYPE.CD, "CD [a-zA-Z]{1,}[a-zA-Z0-9]{0,7}|cd [a-zA-Z]{1,}[a-zA-Z0-9]{0,7}", "Cambia al directorio especificado"));
         commandsList.add(new Command(COMMAND_TYPE.VER, "^VER$|^ver$", "Despliega la versión y espacio libre del sistema"));
         commandsList.add(new Command(COMMAND_TYPE.DIR, "^DIR$|^dir$", "Lista los archivos y directorios que hay en la dirección actual"));
         commandsList.add(new Command(COMMAND_TYPE.RD, "RD [a-zA-Z]{1,}[a-zA-Z0-9]{0,7}|rd [a-zA-Z]{1,}[a-zA-Z0-9]{0,7}", "Elimina un archivo o directorio con el nombre indicado en la ruta actual"));
@@ -99,10 +104,12 @@ public class Setup
         
     }
     
+   
+    
     
     private static String GetErrorMessage(INFORMATION_CODE informationCode)
     {
-        for (ErrorMessage errorMessage : errorMessagesList) 
+        for (InformationMessage errorMessage : informationMessagesList) 
         {
             if (errorMessage.getCode() == informationCode) 
             {
@@ -148,11 +155,15 @@ public class Setup
                         break;
                         
                     case DIR:
-                        ListDirectories(items, "\t");
+                        ListDirectories(currentItem.nextItems, "\t");
                         break;
                         
                     case RD:
                         RemoveDirectory(commandToSearch.split("\\s+")[1]);
+                        break;
+                        
+                    case CD:
+                        ChangeDirectory(commandToSearch.split("\\s+")[1]);
                         break;
                         
                     case EXIT:
@@ -233,10 +244,11 @@ public class Setup
         try 
         {
             
-             // Se indica el archivo con el que se desea trabajar
+            // Se indica el archivo con el que se desea trabajar
             FileInputStream file = new FileInputStream(DIRECTORIES_FILE);
             ObjectInputStream objectInputStream = new ObjectInputStream(file);
-            items = (ArrayList<Item>) objectInputStream.readObject();
+            currentItem = (Item) objectInputStream.readObject();
+            homeItem = currentItem;
             objectInputStream.close();
      
  
@@ -255,16 +267,13 @@ public class Setup
     {
         try 
         {
-            
-            
-
             // se indica el archivo con el que se va trabajar y que trunque los datos para que siempre escriba la cantidad de espacio disponible
             // al inicio del archivo
             FileOutputStream file = new FileOutputStream(DIRECTORIES_FILE, false);
             ObjectOutputStream objectOutput = new ObjectOutputStream(file);
             
              // se escribe el directorio en el archivo
-            objectOutput.writeObject(items);
+            objectOutput.writeObject(currentItem);
             
             objectOutput.close();
 
@@ -277,33 +286,48 @@ public class Setup
     
     private static void ListDirectories(ArrayList<Item> itemsToSearch, String space)
     {
-        
-        for (Item currentItem : itemsToSearch) 
+         // se verifica si  hay directorios para listar
+        if (itemsToSearch.size() > 0)
         {
-             System.out.println(space + currentItem.getName());
-             
-             if(currentItem.items.size() > 0)
-             {
-                ListDirectories(currentItem.items, space + space);
-             }
+            // si es así los listamos
+            for (Item item : itemsToSearch) 
+            {
+                System.out.println(space + item.getName());
+
+                if(item.nextItems.size() > 0)
+                {
+                    ListDirectories(item.nextItems, space + space);
+                }
+            }
         }
+        else
+        {
+           // enc caso contrario indicamos que no se han encontrado directorios
+            System.out.println("Aún no hay archivos agregados");
+        }
+    
+        
+        
+        
         
     }
     
-    private static boolean SearchDirectory(String name)
+    private static Item GetItem(String name)
     {
-        
-        for (Item currentItem : items) 
+        for (Item item : currentItem.nextItems)
         {
-            // se verifica si el nombre hace match
-            if (name.equalsIgnoreCase(currentItem.getName())) 
+            if (item.equals(new Item(name, ItemType.DEFAULT)))
             {
-                return true;
+                return item;
             }
         }
-
         
-        return false;
+        return null;
+    }
+    
+    private static boolean SearchItem(String name)
+    {
+       return currentItem.nextItems.contains(new Item (name, ItemType.FILE));
     }
     
  
@@ -337,7 +361,7 @@ public class Setup
         if (TOTAL_STORAGE >= 8) 
         {
             
-            if(SearchDirectory(name))
+            if(SearchItem(name))
             {
                 System.out.println("Ya existe un directorio con ese nombre");
             }
@@ -347,7 +371,13 @@ public class Setup
                 TOTAL_STORAGE -= 8;
                 
                 // se agrega el directorio, de momento sólo se van a manejar directorios
-                items.add(new Item(name, ItemType.DIRECTORY));
+                Item newItem = new Item(name, ItemType.DIRECTORY);
+                
+                // se indica que el directorio anterior es en el que estamos ubicados
+                newItem.previousItem = currentItem;
+                
+                // agregamos a los ítems siguientes el directorio que acabamos de agregar
+                currentItem.nextItems.add(newItem);
                 
                 WriteItems();
                 WriteStorage();
@@ -360,13 +390,48 @@ public class Setup
         }
     }
     
+    
+    
+    private static void ChangeDirectory(String name)
+    {
+        Item item = GetItem(name);
+        
+        // verificamos si se encontró el ítem
+        if (item != null)
+        {
+            
+            // verificamos si es un directorio
+            if (item.getType() == ItemType.DIRECTORY)
+            {
+                // cambiamos de directorio
+                currentItem = item;
+
+                // actualizamos la ruta actual en pantalla
+                path = String.format("%s%s%s%s>", path ,"\\", name, "\\");
+            }
+            else
+            {
+                System.out.println("El nombre indicado no es un directorio");
+            }
+            
+        }
+        else
+        {
+            // en caso contrario indicamos que no se ha encontrado el directorio
+            System.out.println("No se ha encontrado el archivo o directorio indicado");
+        }
+    }
+    
     private static void RemoveDirectory(String name)
     {
+        
+        Item item = GetItem(name);
+        
         // revisamos que el directorio exista
-        if (SearchDirectory(name))
+        if (item != null)
         {
             // una vez que se ha encontrado vamos a proceder a obtener la referencia a él
-            items.remove(new Item(name, ItemType.FILE));
+            currentItem.nextItems.remove(item);
             
             // se escribe el estado actual de los directorios
             WriteItems();
@@ -391,8 +456,8 @@ public class Setup
         final String versionMessage = "\nMINGOSOFT ® MIDOS \n" +
                             "© Copyright MINGOSOFT CORPORATION 2018\n" +
                             "Versión 1.0 Memoria libre: %d K Autor: Carlos Castro Brenes - Cédula: 1-1596-0319\n" +
-                            "M:\\ _";
-    
+                            path;
+                            
          System.out.print(String.format(versionMessage, TOTAL_STORAGE));
     }
     

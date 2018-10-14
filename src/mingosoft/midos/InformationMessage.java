@@ -9,14 +9,16 @@ package mingosoft.midos;
  *
  * @author ccastro31
  */
-public class ErrorMessage 
+public class InformationMessage 
 {
     
     private INFORMATION_CODE code;
+    private String number;
     private String description;
 
-    public ErrorMessage(INFORMATION_CODE code, String description) {
+    public InformationMessage(INFORMATION_CODE code, String number, String description) {
         this.code = code;
+        this.number = number;
         this.description = description;
     }
     
@@ -29,6 +31,14 @@ public class ErrorMessage
         this.code = code;
     }
 
+    public String getNumber() {
+        return number;
+    }
+
+    public void setNumber(String number) {
+        this.number = number;
+    }
+    
     public String getDescription() {
         return description;
     }

@@ -18,18 +18,21 @@ public class Item implements Serializable
 {
     private String name;
     private ItemType type;
-    ArrayList<Item> items;
+    public Item previousItem;
+    public ArrayList<Item> nextItems;
 
     public Item() {
         this.name = "";
         this.type = ItemType.DEFAULT;
-        this.items = new ArrayList<>();
+        this.previousItem = null;
+        this.nextItems = new ArrayList<>();
     }
 
     public Item(String name, ItemType type) {
         this.name = name;
         this.type = type;
-        this.items = new ArrayList<>();
+        this.previousItem = null;
+        this.nextItems = new ArrayList<>();
     }
 
     public String getName() {
@@ -46,15 +49,6 @@ public class Item implements Serializable
 
     public void setType(ItemType type) {
         this.type = type;
-    }
-
-
-    public ArrayList<Item> getItems() {
-        return items;
-    }
-
-    public void setItems(ArrayList<Item> items) {
-        this.items = items;
     }
 
     @Override
