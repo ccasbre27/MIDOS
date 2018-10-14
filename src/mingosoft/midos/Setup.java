@@ -96,7 +96,7 @@ public class Setup
         commandsList.add(new Command(COMMAND_TYPE.DATE, "^DATE$|^date$", "Despliega la fecha del sistema"));
         commandsList.add(new Command(COMMAND_TYPE.TIME, "^TIME$|^time$", "Despliega la hora del sistema"));
         commandsList.add(new Command(COMMAND_TYPE.MD, "MD [a-zA-Z]{1,}[a-zA-Z0-9]{0,7}|md [a-zA-Z]{1,}[a-zA-Z0-9]{0,7}", "Crea un directorio en la ruta actual"));
-        commandsList.add(new Command(COMMAND_TYPE.CD, "CD [a-zA-Z]{1,}[a-zA-Z0-9]{0,7}|cd [a-zA-Z]{1,}[a-zA-Z0-9]{0,7}", "Cambia al directorio especificado"));
+        commandsList.add(new Command(COMMAND_TYPE.CD, "CD [a-zA-Z]{1,}[a-zA-Z0-9]{0,7}|CD [.]{2,2}|CD [\\\\]{1,1}|cd [a-zA-Z]{1,}[a-zA-Z0-9]{0,7}|cd [.]{2,2}|cd [\\\\]{1,1}", "Cambia al directorio especificado"));
         commandsList.add(new Command(COMMAND_TYPE.VER, "^VER$|^ver$", "Despliega la versión y espacio libre del sistema"));
         commandsList.add(new Command(COMMAND_TYPE.DIR, "^DIR$|^dir$", "Lista los archivos y directorios que hay en la dirección actual"));
         commandsList.add(new Command(COMMAND_TYPE.RD, "RD [a-zA-Z]{1,}[a-zA-Z0-9]{0,7}|rd [a-zA-Z]{1,}[a-zA-Z0-9]{0,7}", "Elimina un archivo o directorio con el nombre indicado en la ruta actual"));
@@ -392,33 +392,78 @@ public class Setup
     
     
     
-    private static void ChangeDirectory(String name)
+    private static void ChangeDirectory(String navigation)
     {
-        Item item = GetItem(name);
         
-        // verificamos si se encontró el ítem
-        if (item != null)
+        // verificamos si es una navegación hacia el padre
+        if (navigation.equals(".."))
         {
-            
-            // verificamos si es un directorio
-            if (item.getType() == ItemType.DIRECTORY)
+            // verificamos que el padre no sea nulo porque el directorio lo tiene nulo
+            if (currentItem.previousItem != null)
             {
-                // cambiamos de directorio
-                currentItem = item;
-
-                // actualizamos la ruta actual en pantalla
-                path = String.format("%s%s%s%s>", path ,"\\", name, "\\");
+      
+                // buscamos la posición en la que está el nombre del directorio
+                int lastBackslashPosition = path.indexOf(currentItem.getName());
+                path = path.substring(0, lastBackslashPosition);
+               
+                // si no es nulo navegamos hacia él
+                currentItem = currentItem.previousItem;
+                
+                 // actualizamos el path
+                        
             }
             else
             {
-                System.out.println("El nombre indicado no es un directorio");
+                System.out.println("Se encuentra en el directorio raíz, no se puede navegar hacia el directorio padre");
             }
-            
+        }
+        else if (navigation.equals("\\"))
+        {
+            // se quiere navegar al directorio padre
+            currentItem = GetRootDirectory(currentItem);
         }
         else
         {
-            // en caso contrario indicamos que no se ha encontrado el directorio
-            System.out.println("No se ha encontrado el archivo o directorio indicado");
+            Item item = GetItem(navigation);
+        
+            // verificamos si se encontró el ítem
+            if (item != null)
+            {
+
+                // verificamos si es un directorio
+                if (item.getType() == ItemType.DIRECTORY)
+                {
+                    // cambiamos de directorio
+                    currentItem = item;
+
+                    // actualizamos la ruta actual en pantalla
+                    path = String.format("%s%s%s", path , navigation, "\\");
+                }
+                else
+                {
+                    System.out.println("El nombre indicado no es un directorio");
+                }
+
+            }
+            else
+            {
+                // en caso contrario indicamos que no se ha encontrado el directorio
+                System.out.println("No se ha encontrado el archivo o directorio indicado");
+            }
+        }
+        
+        
+    }
+    
+    public static Item GetRootDirectory(Item item)
+    {
+        if (item.previousItem == null)
+        {
+            return item;
+        }
+        else
+        {
+            return GetRootDirectory(item.previousItem);
         }
     }
     
@@ -456,7 +501,7 @@ public class Setup
         final String versionMessage = "\nMINGOSOFT ® MIDOS \n" +
                             "© Copyright MINGOSOFT CORPORATION 2018\n" +
                             "Versión 1.0 Memoria libre: %d K Autor: Carlos Castro Brenes - Cédula: 1-1596-0319\n" +
-                            path;
+                            path + ">";
                             
          System.out.print(String.format(versionMessage, TOTAL_STORAGE));
     }
