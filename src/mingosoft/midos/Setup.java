@@ -48,6 +48,8 @@ public class Setup
     
     static boolean exit = false;
     
+    static COMMAND_LINE_TYPE commandLineType = COMMAND_LINE_TYPE.PROMPT;
+    
     public static void main (String [] args) throws IOException
     {
         String optionEntered = "";
@@ -62,7 +64,7 @@ public class Setup
        
         LoadStorage();
         LoadItems();
-
+        
         // se debe repetir hasta que el usuario desee salir mediante el comando EXIT
         do 
         {
@@ -71,7 +73,6 @@ public class Setup
             DisplayVersion();
 
             optionEntered = scanner.nextLine();
-
 
             // se verifica si el texto ingresado corresponde a un comando
             CheckCommand(optionEntered);
@@ -91,20 +92,18 @@ public class Setup
     
     private static void LoadCommands()
     {
-        commandsList.add(new Command(COMMAND_TYPE.CLS, "^CLS$|^cls$", "Permite limpiar la pantalla de la consola"));
-        commandsList.add(new Command(COMMAND_TYPE.DATE, "^DATE$|^date$", "Despliega la fecha del sistema"));
-        commandsList.add(new Command(COMMAND_TYPE.TIME, "^TIME$|^time$", "Despliega la hora del sistema"));
-        commandsList.add(new Command(COMMAND_TYPE.MD, "MD [a-zA-Z]{1,}[a-zA-Z0-9]{0,7}|md [a-zA-Z]{1,}[a-zA-Z0-9]{0,7}", "Crea un directorio en la ruta actual"));
-        commandsList.add(new Command(COMMAND_TYPE.CD, "CD [a-zA-Z]{1,}[a-zA-Z0-9]{0,7}|CD [.]{2,2}|CD [\\\\]{1,1}|cd [a-zA-Z]{1,}[a-zA-Z0-9]{0,7}|cd [.]{2,2}|cd [\\\\]{1,1}", "Cambia al directorio especificado"));
-        commandsList.add(new Command(COMMAND_TYPE.VER, "^VER$|^ver$", "Despliega la versión y espacio libre del sistema"));
-        commandsList.add(new Command(COMMAND_TYPE.DIR, "^DIR$|^dir$", "Lista los archivos y directorios que hay en la dirección actual"));
-        commandsList.add(new Command(COMMAND_TYPE.RD, "RD [a-zA-Z]{1,}[a-zA-Z0-9]{0,7}|rd [a-zA-Z]{1,}[a-zA-Z0-9]{0,7}", "Elimina un archivo o directorio con el nombre indicado en la ruta actual"));
-        commandsList.add(new Command(COMMAND_TYPE.EXIT, "^EXIT$|^exit$", "Finaliza el programa"));
+        commandsList.add(new Command(COMMAND_TYPE.CLS, "^CLS$", "Permite limpiar la pantalla de la consola"));
+        commandsList.add(new Command(COMMAND_TYPE.DATE, "^DATE$", "Despliega la fecha del sistema"));
+        commandsList.add(new Command(COMMAND_TYPE.TIME, "^TIME$", "Despliega la hora del sistema"));
+        commandsList.add(new Command(COMMAND_TYPE.MD, "MD [a-zA-Z]{1,}[a-zA-Z0-9]{0,7}", "Crea un directorio en la ruta actual"));
+        commandsList.add(new Command(COMMAND_TYPE.CD, "CD [a-zA-Z]{1,}[a-zA-Z0-9]{0,7}|CD [.]{2,2}|CD [\\\\]{1,1}", "Cambia al directorio especificado"));
+        commandsList.add(new Command(COMMAND_TYPE.VER, "^VER$", "Despliega la versión y espacio libre del sistema"));
+        commandsList.add(new Command(COMMAND_TYPE.DIR, "^DIR$", "Lista los archivos y directorios que hay en la dirección actual"));
+        commandsList.add(new Command(COMMAND_TYPE.RD, "RD [a-zA-Z]{1,}[a-zA-Z0-9]{0,7}", "Elimina un archivo o directorio con el nombre indicado en la ruta actual"));
+        commandsList.add(new Command(COMMAND_TYPE.PROMPT, "PROMPT|PROMPT \\$P|PROMPT \\$G|PROMPT \\$P \\$G|PROMPT \\$G \\$P", "Cambia la apariencia de la línea de comandos"));
+        commandsList.add(new Command(COMMAND_TYPE.EXIT, "^EXIT$", "Finaliza el programa"));
         
     }
-    
-   
-    
     
     private static String GetErrorMessage(INFORMATION_CODE informationCode)
     {
@@ -122,10 +121,12 @@ public class Setup
        private static void CheckCommand(String commandToSearch)
     {
         boolean isValidCommand = false;
+       
         
         for (Command command : commandsList)
         {
-            if (commandToSearch.matches(command.getPatternAccepted())) 
+            
+            if (commandToSearch.toUpperCase().matches(command.getPatternAccepted())) 
             {
                 isValidCommand = true;
                 
@@ -165,11 +166,14 @@ public class Setup
                         ChangeDirectory(commandToSearch.split("\\s+")[1]);
                         break;
                         
+                    case PROMPT:
+                        ChangeCommandLineType(commandToSearch);
+                        break;
+                            
                     case EXIT:
                         Exit();
                         break;
                         
-                    
                 }
             }
             
@@ -271,9 +275,10 @@ public class Setup
             // al inicio del archivo
             FileOutputStream file = new FileOutputStream(DIRECTORIES_FILE, false);
             ObjectOutputStream objectOutput = new ObjectOutputStream(file);
-            
-             // se escribe el directorio en el archivo
-            objectOutput.writeObject(currentItem);
+         
+            // se escribe el directorio en el archivo
+            // obtenemos el directorio root porque si escribimos el directorio actual y hemos navegado vamos a dejar de lado los ítems superiores
+            objectOutput.writeObject(GetRootDirectory(currentItem));
             
             objectOutput.close();
 
@@ -301,10 +306,6 @@ public class Setup
            // enc caso contrario indicamos que no se han encontrado directorios
             System.out.println("Aún no hay archivos agregados");
         }
-    
-        
-        
-        
         
     }
     
@@ -326,7 +327,6 @@ public class Setup
        return currentItem.nextItems.contains(new Item (name, ItemType.FILE));
     }
     
- 
     private static void ClearScreen()
     {
         for (int i = 0; i < 10; i++) 
@@ -335,7 +335,6 @@ public class Setup
         }
         
     }
-    
     
     private static void DisplayDate()
     {
@@ -385,8 +384,6 @@ public class Setup
             System.out.println("No hay espacio disponible para crear el directorio");
         }
     }
-    
-    
     
     private static void ChangeDirectory(String navigation)
     {
@@ -450,7 +447,6 @@ public class Setup
             }
         }
         
-        
     }
     
     public static Item GetRootDirectory(Item item)
@@ -493,15 +489,58 @@ public class Setup
         }
     }
     
+    private static void ChangeCommandLineType(String commandToSearch)
+    {
+        if(commandToSearch.toUpperCase().matches("PROMPT"))
+        {
+            commandLineType = COMMAND_LINE_TYPE.PROMPT;
+        }
+        else if(commandToSearch.toUpperCase().matches("PROMPT \\$P"))
+        {
+            commandLineType = COMMAND_LINE_TYPE.PROMPT_P;
+        }
+        else if(commandToSearch.toUpperCase().matches("PROMPT \\$G"))
+        {
+            commandLineType = COMMAND_LINE_TYPE.PROMPT_G;
+        }
+        else if(commandToSearch.toUpperCase().matches("PROMPT \\$P \\$G"))
+        {
+            commandLineType = COMMAND_LINE_TYPE.PROMPT_PG;
+        }
+        else if(commandToSearch.toUpperCase().matches("PROMPT \\$G \\$P"))
+        {
+            commandLineType = COMMAND_LINE_TYPE.PROMPT_GP;
+        }
+    }
+    
     private static void DisplayVersion()
     {
         // mensaje que se va desplegar al usuario con la información de la memoria restante 
-        final String versionMessage = "\nMINGOSOFT ® MIDOS \n" +
+        String versionMessage = "\nMINGOSOFT ® MIDOS \n" +
                             "© Copyright MINGOSOFT CORPORATION 2018\n" +
-                            "Versión 1.0 Memoria libre: %d K Autor: Carlos Castro Brenes - Cédula: 1-1596-0319\n" +
-                            path + ">";
+                            "Versión 1.0 Memoria libre: %d K Autor: Carlos Castro Brenes - Cédula: 1-1596-0319\n";
+        
+        switch (commandLineType)
+        {
+            case PROMPT:
+            case PROMPT_PG:
+                versionMessage += path + ">";
+                break;
+                
+            case PROMPT_P:
+                versionMessage += path;
+                break;
+                
+            case PROMPT_G:
+                versionMessage += ">";
+                break;
+           
+            case PROMPT_GP:
+                versionMessage += ">" + path;
+                break;
+        }
                             
-         System.out.print(String.format(versionMessage, TOTAL_STORAGE));
+        System.out.print(String.format(versionMessage, TOTAL_STORAGE));
     }
     
     private static void Exit()

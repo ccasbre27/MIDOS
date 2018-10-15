@@ -9,7 +9,7 @@ package mingosoft.midos;
  *
  * @author ccastro31
  */
-public enum COMMAND_TYPE 
+public enum COMMAND_LINE_TYPE 
 {
-    DEFAULT, CLS, VER, DATE, TIME, EXIT, MD, DIR, RD, CD, PROMPT
+    PROMPT, PROMPT_P, PROMPT_G, PROMPT_PG, PROMPT_GP
 }
