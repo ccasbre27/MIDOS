@@ -6,33 +6,29 @@
 package mingosoft.midos;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Objects;
 
 /**
  *
  * @author ccastro31
  */
-// se implementa serializable para indicarle que 
-public class Item implements Serializable
+public class BaseItem implements Serializable
 {
-    private String name;
-    private ItemType type;
-    public Item previousItem;
-    public ArrayList<Item> nextItems;
+    protected String name;
+    protected ItemType type;
 
-    public Item() {
+    public BaseItem() {
         this.name = "";
         this.type = ItemType.DEFAULT;
-        this.previousItem = null;
-        this.nextItems = new ArrayList<>();
+    }
+    
+    public BaseItem(String name) {
+        this.name = name;
     }
 
-    public Item(String name, ItemType type) {
+    public BaseItem(String name, ItemType type) {
         this.name = name;
         this.type = type;
-        this.previousItem = null;
-        this.nextItems = new ArrayList<>();
     }
 
     public String getName() {
@@ -74,13 +70,10 @@ public class Item implements Serializable
             return false;
         }
         
-        final Item receivedItem = (Item) obj;
+        final BaseItem receivedItem = (BaseItem) obj;
         
         return Objects.equals(this.name, receivedItem.name);
     }
 
-    
-
-    
-    
 }
+

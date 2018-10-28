@@ -42,7 +42,7 @@ public class Setup
     static ArrayList <Command> commandsList = new ArrayList<Command>();
     
     // indica el directorio actual
-    static Item currentItem = new Item();
+    static Directory currentItem = new Directory();
     
     static String path = "M:\\";
     
@@ -50,11 +50,13 @@ public class Setup
     
     static COMMAND_LINE_TYPE commandLineType = COMMAND_LINE_TYPE.PROMPT;
     
+    static Scanner scanner = null;
+    
     public static void main (String [] args) throws IOException
     {
         String optionEntered = "";
         INFORMATION_CODE informationCode = INFORMATION_CODE.DEFAULT;
-        Scanner scanner = new Scanner(System.in);
+        scanner = new Scanner(System.in);
         
         // se cargan los mensajes de error
         LoadErrorMessages();
@@ -101,6 +103,7 @@ public class Setup
         commandsList.add(new Command(COMMAND_TYPE.DIR, "^DIR$", "Lista los archivos y directorios que hay en la dirección actual"));
         commandsList.add(new Command(COMMAND_TYPE.RD, "RD [a-zA-Z]{1,}[a-zA-Z0-9]{0,7}", "Elimina un archivo o directorio con el nombre indicado en la ruta actual"));
         commandsList.add(new Command(COMMAND_TYPE.PROMPT, "PROMPT|PROMPT \\$P|PROMPT \\$G|PROMPT \\$P \\$G|PROMPT \\$G \\$P", "Cambia la apariencia de la línea de comandos"));
+        commandsList.add(new Command(COMMAND_TYPE.COPY_CON, "COPY CON [a-zA-Z]{1,}[a-zA-Z0-9]{0,7}", "Crea un archivo en la ruta actual"));
         commandsList.add(new Command(COMMAND_TYPE.EXIT, "^EXIT$", "Finaliza el programa"));
         
     }
@@ -118,7 +121,7 @@ public class Setup
         return "";
     }
     
-       private static void CheckCommand(String commandToSearch)
+    private static void CheckCommand(String commandToSearch)
     {
         boolean isValidCommand = false;
        
@@ -136,43 +139,47 @@ public class Setup
                     case CLS:
                         // se simula un limpiado de pantalla con 10 líneas en blanco
                         ClearScreen();
-                        break;
+                        return;
                         
                     case DATE:
                         DisplayDate();
-                        break;
+                        return;
                         
                     case TIME:
                         DisplayTime();
-                        break;
+                        return;
                         
                     case MD:
-                        MakeItem(commandToSearch.split("\\s+")[1]);
-                        break;
+                        CreateItem(commandToSearch.split("\\s+")[1], ItemType.DIRECTORY);
+                        return;
                 
                     case VER:
                         DisplayVersion();
-                        break;
+                        return;
                         
                     case DIR:
                         ListDirectories();
-                        break;
+                        return;
                         
                     case RD:
                         RemoveDirectory(commandToSearch.split("\\s+")[1]);
-                        break;
+                        return;
                         
                     case CD:
                         ChangeDirectory(commandToSearch.split("\\s+")[1]);
-                        break;
+                        return;
                         
                     case PROMPT:
                         ChangeCommandLineType(commandToSearch);
-                        break;
+                        return;
+                        
+                    case COPY_CON:
+                        CreateItem(commandToSearch.split("\\s+")[2], ItemType.FILE);
+                        return;
                             
                     case EXIT:
                         Exit();
-                        break;
+                        return;
                         
                 }
             }
@@ -252,7 +259,7 @@ public class Setup
             // Se indica el archivo con el que se desea trabajar
             FileInputStream file = new FileInputStream(DIRECTORIES_FILE);
             ObjectInputStream objectInputStream = new ObjectInputStream(file);
-            currentItem = (Item) objectInputStream.readObject();
+            currentItem = (Directory) objectInputStream.readObject();
             objectInputStream.close();
      
  
@@ -295,9 +302,10 @@ public class Setup
         if (currentItem.nextItems.size() > 0)
         {
             // si es así los listamos
-            for (Item item : currentItem.nextItems) 
+            for (Object item : currentItem.nextItems) 
             {
-                System.out.println("\t" + item.getName());
+                BaseItem baseItem = (BaseItem) item;
+                System.out.println("\t" + baseItem.getName());
 
             }
         }
@@ -309,13 +317,14 @@ public class Setup
         
     }
     
-    private static Item GetItem(String name)
+    private static Directory GetDirectory(String name)
     {
-        for (Item item : currentItem.nextItems)
+        for (Object item : currentItem.nextItems)
         {
-            if (item.equals(new Item(name, ItemType.DEFAULT)))
+            if (item.equals(new Directory(name, ItemType.DEFAULT)))
             {
-                return item;
+                
+                return (Directory) item;
             }
         }
         
@@ -324,7 +333,7 @@ public class Setup
     
     private static boolean SearchItem(String name)
     {
-       return currentItem.nextItems.contains(new Item (name, ItemType.FILE));
+       return currentItem.nextItems.contains(new Directory (name, ItemType.DEFAULT));
     }
     
     private static void ClearScreen()
@@ -350,39 +359,106 @@ public class Setup
         System.out.println(new SimpleDateFormat("HH:mm:ss").format(currentTime));
     }
     
-    private static void MakeItem(String name)
+    private static void CreateItem(String name, ItemType itemType)
     {
-        // se verifica si hay espacio disponible para crear el directorio, cada uno ocupa 8k
-        if (TOTAL_STORAGE >= 8) 
+        
+        // se verifica la cantidad de hijos actuales
+        if (currentItem.nextItems.size() >= 8) 
+        {
+            System.out.println("Ya se ha alcanzado la cantidad máxima de archivos y directorios (8 como máximo entre los dos), elimine alguno si desea crear otro");
+        }
+        else
         {
             
-            if(SearchItem(name))
+        
+            switch (itemType)
             {
-                System.out.println("Ya existe un directorio con ese nombre");
+                case DIRECTORY:
+
+                    // se verifica si hay espacio disponible para crear el directorio, cada uno ocupa 8k
+                    if (TOTAL_STORAGE >= 8) 
+                    {
+
+                        if(SearchItem(name))
+                        {
+                            System.out.println("Ya existe un archivo o directorio con ese nombre");
+                        }
+                        else
+                        {
+                            // cantidad de bytes que ocupan los directorios
+                            TOTAL_STORAGE -= 8;
+
+                            // se agrega el directorio
+                            Directory newItem = new Directory(name, ItemType.DIRECTORY);
+
+                            // se indica que el directorio anterior es en el que estamos ubicados
+                            newItem.previousItem = currentItem;
+
+                            // agregamos a los ítems siguientes el directorio que acabamos de agregar
+                            currentItem.nextItems.add(newItem);
+
+                            WriteItems();
+                            WriteStorage();
+                            System.out.println("El directorio se ha creado exitosamente");
+                        }    
+                    }
+                    else    
+                    {
+                        System.out.println("No hay espacio disponible para crear el directorio");
+                    }
+                    break;
+
+                case FILE:
+                    // se verifica si hay espacio disponible para crear el archivo, cada uno ocupa 4k
+                    if (TOTAL_STORAGE >= 4) 
+                    {
+                        if(SearchItem(name))
+                        {
+                            System.out.println("Ya existe un archivo o directorio con ese nombre");
+                        }
+                        else
+                        {
+                            String content = "";
+
+                            // cantidad de bytes que ocupan los archivos
+                            TOTAL_STORAGE -= 4;
+
+                            // se agrega el archivo
+                            CustomFile customFile = new CustomFile(name, ItemType.FILE);
+
+                            // solicitamos el contenido del archivo
+                            System.out.println("Ingrese el texto del archivo, para indicar el fin debe ingresar ^Z");
+                            content = scanner.nextLine().trim();
+
+                            // verificamos si se ha indicado el fin del contenido, de lo contrario le indicamos que debe volver a ingresarlo
+                            while (!content.endsWith("^Z") && !content.endsWith("^z"))
+                            {
+                                System.out.println("No indicó el fin del contenido (^Z), ingrese  nuevament el texto del archivo, para indicar el fin debe ingresar ^Z");
+                                content = scanner.nextLine();
+                            }
+
+                            customFile.setContent(content.substring(0, content.length() - 3));
+
+                            // agregamos a los ítems siguientes el directorio que acabamos de agregar
+                            currentItem.nextItems.add(customFile);
+
+                            WriteItems();
+                            WriteStorage();
+                            System.out.println("El archivo se ha creado exitosamente");
+                        }
+                    }
+                    else    
+                    {
+                        System.out.println("No hay espacio disponible para crear el archivo");
+                    }
+                    break;
+                    
+                default: 
+                    break;
+
             }
-            else
-            {
-                // cantidad de bytes que ocupan los directorios
-                TOTAL_STORAGE -= 8;
-                
-                // se agrega el directorio, de momento sólo se van a manejar directorios
-                Item newItem = new Item(name, ItemType.DIRECTORY);
-                
-                // se indica que el directorio anterior es en el que estamos ubicados
-                newItem.previousItem = currentItem;
-                
-                // agregamos a los ítems siguientes el directorio que acabamos de agregar
-                currentItem.nextItems.add(newItem);
-                
-                WriteItems();
-                WriteStorage();
-                System.out.println("El directorio se ha creado exitosamente");
-            }    
-        }
-        else    
-        {
-            System.out.println("No hay espacio disponible para crear el directorio");
-        }
+            
+        }   
     }
     
     private static void ChangeDirectory(String navigation)
@@ -419,7 +495,7 @@ public class Setup
         }
         else
         {
-            Item item = GetItem(navigation);
+            Directory item = GetDirectory(navigation);
         
             // verificamos si se encontró el ítem
             if (item != null)
@@ -449,7 +525,7 @@ public class Setup
         
     }
     
-    public static Item GetRootDirectory(Item item)
+    public static Directory GetRootDirectory(Directory item)
     {
         if (item.previousItem == null)
         {
@@ -464,7 +540,7 @@ public class Setup
     private static void RemoveDirectory(String name)
     {
         
-        Item item = GetItem(name);
+        Directory item = GetDirectory(name);
         
         // revisamos que el directorio exista
         if (item != null)
