@@ -105,6 +105,7 @@ public class Setup
         commandsList.add(new Command(COMMAND_TYPE.PROMPT, "PROMPT|PROMPT \\$P|PROMPT \\$G|PROMPT \\$P \\$G|PROMPT \\$G \\$P", "Cambia la apariencia de la línea de comandos"));
         commandsList.add(new Command(COMMAND_TYPE.COPY_CON, "COPY CON [a-zA-Z]{1,}[a-zA-Z0-9]{0,7}", "Crea un archivo en la ruta actual"));
         commandsList.add(new Command(COMMAND_TYPE.TYPE, "TYPE [a-zA-Z]{1,}[a-zA-Z0-9]{0,7}", "Muestra el contenido del archivo especificado"));
+        commandsList.add(new Command(COMMAND_TYPE.DEL, "DEL [a-zA-Z]{1,}[a-zA-Z0-9]{0,7}", "Elimina archivo especificado"));
         commandsList.add(new Command(COMMAND_TYPE.EXIT, "^EXIT$", "Finaliza el programa"));
         
     }
@@ -210,6 +211,10 @@ public class Setup
                         
                     case TYPE:
                         ShowContent(commandToSearch.split("\\s+")[1]);
+                        return;
+                        
+                    case DEL:
+                        DeleteFile(commandToSearch.split("\\s+")[1]);
                         return;
                             
                     case EXIT:
@@ -658,6 +663,11 @@ public class Setup
         }
     }
     
+    /**
+    * Muestra el contenido del archivo indicado
+    *
+    * @param  name : nombre del archivo a buscar
+    */
     private static void ShowContent(String name)
     {
         // obtenemos la referencia al archivo 
@@ -674,6 +684,33 @@ public class Setup
         }
     }
     
+    
+    private static void DeleteFile(String name)
+    {
+        CustomFile customFile = (CustomFile) GetItem(name, ItemType.FILE);
+        
+        // revisamos que el directorio exista
+        if (customFile != null)
+        {
+            currentItem.nextItems.remove(customFile);
+
+            // se escribe el estado actual de los directorios
+            WriteItems();
+
+            // se suma el espacio eliminado, 4 para archivos
+            TOTAL_STORAGE += 4;
+
+            // se actualiza el espacio en memoria
+            WriteStorage();
+
+            System.out.println("El archivo se ha eliminado exitosamente");
+            
+        }
+        else
+        {
+            System.out.println("No se ha encontrado el archivo indicado");
+        }
+    }
   
     
     private static void Exit()
