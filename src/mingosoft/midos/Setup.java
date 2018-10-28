@@ -106,6 +106,7 @@ public class Setup
         commandsList.add(new Command(COMMAND_TYPE.COPY_CON, "COPY CON [a-zA-Z]{1,}[a-zA-Z0-9]{0,7}", "Crea un archivo en la ruta actual"));
         commandsList.add(new Command(COMMAND_TYPE.TYPE, "TYPE [a-zA-Z]{1,}[a-zA-Z0-9]{0,7}", "Muestra el contenido del archivo especificado"));
         commandsList.add(new Command(COMMAND_TYPE.DEL, "DEL [a-zA-Z]{1,}[a-zA-Z0-9]{0,7}", "Elimina archivo especificado"));
+        commandsList.add(new Command(COMMAND_TYPE.REN, "REN [a-zA-Z]{1,}[a-zA-Z0-9]{0,7} [a-zA-Z]{1,}[a-zA-Z0-9]{0,7}", "Cambia el nombre del archivo o directorio especificado"));
         commandsList.add(new Command(COMMAND_TYPE.EXIT, "^EXIT$", "Finaliza el programa"));
         
     }
@@ -215,6 +216,11 @@ public class Setup
                         
                     case DEL:
                         DeleteFile(commandToSearch.split("\\s+")[1]);
+                        return;
+                        
+                    case REN:
+                        String [] names = commandToSearch.split("\\s+");
+                        RenameItem(names[1], names[2]);
                         return;
                             
                     case EXIT:
@@ -712,6 +718,51 @@ public class Setup
         }
     }
   
+    
+    private static void RenameItem(String oldName, String newName)
+    {
+        // verificamos si existe el archivo o directorio
+        if (SearchItem(oldName, ItemType.DEFAULT)) 
+        {
+            
+            // verificamos si ya existe un directorio con el nuevo nombre
+            if (SearchItem(newName, ItemType.DEFAULT))  
+            {
+                System.out.println("Ya existe un archivo o directorio con el nuevo nombre");
+            }
+            else
+            {
+                // si lo encuentra vamos a buscarlo
+                int directoryPosition = currentItem.nextItems.indexOf(new Directory(oldName, ItemType.DIRECTORY));
+                int filePosition = currentItem.nextItems.indexOf(new CustomFile(oldName, ItemType.FILE));
+
+                // -1 indica que no se encontró
+                if (directoryPosition > -1) 
+                {
+                    Directory directory = (Directory) currentItem.nextItems.get(directoryPosition);
+                    directory.setName(newName);
+                    currentItem.nextItems.set(directoryPosition, directory);
+
+                }
+                else if (filePosition > -1)
+                {
+                    CustomFile customFile = (CustomFile) currentItem.nextItems.get(filePosition);
+                    customFile.setName(newName);
+                    currentItem.nextItems.set(directoryPosition, customFile);
+                }
+
+                // se escribe el estado actual de los directorios
+                WriteItems();
+
+                System.out.println("El nombre se ha cambiado exitosamente");
+            }
+            
+        }
+        else
+        {
+            System.out.println("No se ha encontrado el archivo o directorio con el nombre especificado");
+        }
+    }
     
     private static void Exit()
     {
