@@ -104,6 +104,7 @@ public class Setup
         commandsList.add(new Command(COMMAND_TYPE.RD, "RD [a-zA-Z]{1,}[a-zA-Z0-9]{0,7}", "Elimina un archivo o directorio con el nombre indicado en la ruta actual"));
         commandsList.add(new Command(COMMAND_TYPE.PROMPT, "PROMPT|PROMPT \\$P|PROMPT \\$G|PROMPT \\$P \\$G|PROMPT \\$G \\$P", "Cambia la apariencia de la línea de comandos"));
         commandsList.add(new Command(COMMAND_TYPE.COPY_CON, "COPY CON [a-zA-Z]{1,}[a-zA-Z0-9]{0,7}", "Crea un archivo en la ruta actual"));
+        commandsList.add(new Command(COMMAND_TYPE.TYPE, "TYPE [a-zA-Z]{1,}[a-zA-Z0-9]{0,7}", "Muestra el contenido del archivo especificado"));
         commandsList.add(new Command(COMMAND_TYPE.EXIT, "^EXIT$", "Finaliza el programa"));
         
     }
@@ -119,6 +120,36 @@ public class Setup
         }
         
         return "";
+    }
+    
+      private static void DisplayVersion()
+    {
+        // mensaje que se va desplegar al usuario con la información de la memoria restante 
+        String versionMessage = "\nMINGOSOFT ® MIDOS \n" +
+                            "© Copyright MINGOSOFT CORPORATION 2018\n" +
+                            "Versión 1.0 Memoria libre: %d K Autor: Carlos Castro Brenes - Cédula: 1-1596-0319\n";
+        
+        switch (commandLineType)
+        {
+            case PROMPT:
+            case PROMPT_PG:
+                versionMessage += path + ">";
+                break;
+                
+            case PROMPT_P:
+                versionMessage += path;
+                break;
+                
+            case PROMPT_G:
+                versionMessage += ">";
+                break;
+           
+            case PROMPT_GP:
+                versionMessage += ">" + path;
+                break;
+        }
+                            
+        System.out.print(String.format(versionMessage, TOTAL_STORAGE));
     }
     
     private static void CheckCommand(String commandToSearch)
@@ -175,6 +206,10 @@ public class Setup
                         
                     case COPY_CON:
                         CreateItem(commandToSearch.split("\\s+")[2], ItemType.FILE);
+                        return;
+                        
+                    case TYPE:
+                        ShowContent(commandToSearch.split("\\s+")[1]);
                         return;
                             
                     case EXIT:
@@ -317,23 +352,49 @@ public class Setup
         
     }
     
-    private static Directory GetDirectory(String name)
+    private static Object GetItem(String name, ItemType itemType)
     {
         for (Object item : currentItem.nextItems)
         {
-            if (item.equals(new Directory(name, ItemType.DEFAULT)))
+            switch (itemType) 
             {
-                
-                return (Directory) item;
+                case DIRECTORY:
+                    if (item.equals(new Directory(name, itemType)))
+                    {
+                        return (Directory) item;
+                    }
+                    break;
+                    
+                case FILE:
+                    if (item.equals(new CustomFile(name, itemType)))
+                    {
+                        return (CustomFile) item;
+                    }
+                    break;
             }
+            
         }
         
         return null;
     }
     
-    private static boolean SearchItem(String name)
+    private static boolean SearchItem(String name, ItemType itemType)
     {
-       return currentItem.nextItems.contains(new Directory (name, ItemType.DEFAULT));
+        switch (itemType)
+        {
+            case DIRECTORY:
+                return currentItem.nextItems.contains(new Directory (name, ItemType.DIRECTORY));
+                
+            case FILE:
+                return currentItem.nextItems.contains(new CustomFile (name, ItemType.FILE));
+                
+            case DEFAULT:
+                return currentItem.nextItems.contains(new Directory (name, ItemType.DIRECTORY)) || currentItem.nextItems.contains(new CustomFile (name, ItemType.FILE));
+                
+        }
+        
+        return false;
+        
     }
     
     private static void ClearScreen()
@@ -379,7 +440,7 @@ public class Setup
                     if (TOTAL_STORAGE >= 8) 
                     {
 
-                        if(SearchItem(name))
+                        if(SearchItem(name, ItemType.DIRECTORY))
                         {
                             System.out.println("Ya existe un archivo o directorio con ese nombre");
                         }
@@ -412,7 +473,7 @@ public class Setup
                     // se verifica si hay espacio disponible para crear el archivo, cada uno ocupa 4k
                     if (TOTAL_STORAGE >= 4) 
                     {
-                        if(SearchItem(name))
+                        if(SearchItem(name, ItemType.FILE))
                         {
                             System.out.println("Ya existe un archivo o directorio con ese nombre");
                         }
@@ -495,7 +556,7 @@ public class Setup
         }
         else
         {
-            Directory item = GetDirectory(navigation);
+            Directory item = (Directory) GetItem(navigation, ItemType.DIRECTORY);
         
             // verificamos si se encontró el ítem
             if (item != null)
@@ -519,7 +580,7 @@ public class Setup
             else
             {
                 // en caso contrario indicamos que no se ha encontrado el directorio
-                System.out.println("No se ha encontrado el archivo o directorio indicado");
+                System.out.println("No se ha encontrado el directorio indicado");
             }
         }
         
@@ -540,24 +601,32 @@ public class Setup
     private static void RemoveDirectory(String name)
     {
         
-        Directory item = GetDirectory(name);
+        Directory directory = (Directory) GetItem(name, ItemType.DIRECTORY);
         
         // revisamos que el directorio exista
-        if (item != null)
+        if (directory != null)
         {
-            // una vez que se ha encontrado vamos a proceder a obtener la referencia a él
-            currentItem.nextItems.remove(item);
+            // verificamos que el directorio esté vacío
+            if (directory.nextItems.size() > 0) 
+            {
+                System.out.println("El directorio no se encuentra vacío, debe eliminar primero el contenido de éste");
+            }
+            else
+            {
+                currentItem.nextItems.remove(directory);
             
-            // se escribe el estado actual de los directorios
-            WriteItems();
-            
-            // se suma el espacio eliminado
-            TOTAL_STORAGE += 8;
-            
-            // se actualiza el espacio en memoria
-            WriteStorage();
-            
-            System.out.println("El directorio se ha eliminado exitosamente");
+                // se escribe el estado actual de los directorios
+                WriteItems();
+
+                // se suma el espacio eliminado
+                TOTAL_STORAGE += 8;
+
+                // se actualiza el espacio en memoria
+                WriteStorage();
+
+                System.out.println("El directorio se ha eliminado exitosamente");
+            }
+           
         }
         else
         {
@@ -589,35 +658,23 @@ public class Setup
         }
     }
     
-    private static void DisplayVersion()
+    private static void ShowContent(String name)
     {
-        // mensaje que se va desplegar al usuario con la información de la memoria restante 
-        String versionMessage = "\nMINGOSOFT ® MIDOS \n" +
-                            "© Copyright MINGOSOFT CORPORATION 2018\n" +
-                            "Versión 1.0 Memoria libre: %d K Autor: Carlos Castro Brenes - Cédula: 1-1596-0319\n";
+        // obtenemos la referencia al archivo 
+        CustomFile customFile = (CustomFile) GetItem(name, ItemType.FILE);
         
-        switch (commandLineType)
+        // revisamos que el directorio exista
+        if (customFile != null)
         {
-            case PROMPT:
-            case PROMPT_PG:
-                versionMessage += path + ">";
-                break;
-                
-            case PROMPT_P:
-                versionMessage += path;
-                break;
-                
-            case PROMPT_G:
-                versionMessage += ">";
-                break;
-           
-            case PROMPT_GP:
-                versionMessage += ">" + path;
-                break;
+            System.out.println(customFile.getContent());
         }
-                            
-        System.out.print(String.format(versionMessage, TOTAL_STORAGE));
+        else
+        {
+            System.out.println("No se ha encontrado un archivo con ese nombre");
+        }
     }
+    
+  
     
     private static void Exit()
     {
