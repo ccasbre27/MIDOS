@@ -18,6 +18,8 @@ import java.io.PrintWriter;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.Scanner;
 
@@ -342,18 +344,60 @@ public class Setup
         }
     }
     
+    private static void SortItemsByName()
+    {
+        // creamos un comparador de tipo object para ordenar alfabéticamente
+        Collections.sort(currentItem.nextItems, new Comparator<Object>() {
+            public int compare(Object firstObject, Object secondObject) {
+            
+                // como son de tipo object entonces hacemos un casting para poder acceder a las propiedades
+                return ((BaseItem)firstObject).getName().compareTo(((BaseItem)secondObject).getName());
+            }
+         });
+    }
+    
     private static void ListDirectories()
     {
          // se verifica si  hay directorios para listar
         if (currentItem.nextItems.size() > 0)
         {
+            // ordenamos los ítems alfabéticamente
+            SortItemsByName();
+            
+            System.out.println("\nDirectorio de " + path);
+            
+            String nameOfType = "";
+            int quantityOfDirectories = 0;
+            int quantityOfFiles = 0;
+            
             // si es así los listamos
             for (Object item : currentItem.nextItems) 
             {
                 BaseItem baseItem = (BaseItem) item;
-                System.out.println("\t" + baseItem.getName());
-
+                
+                switch (baseItem.getType())
+                {
+                    case DIRECTORY:
+                        nameOfType = "<DIR>";
+                        quantityOfDirectories ++;
+                        break;
+                        
+                    case FILE:
+                        nameOfType = "arch";
+                        quantityOfFiles ++;
+                        break;
+                }       
+                
+                // %1$-12s coloca 12 caracteres del primer string, si es menor de 12 lo rellena con ceros
+                // %2$s hace referencia al segundo parámetro de tipo string
+                System.out.println(String.format("%1$-12s %2$s", baseItem.getName(), nameOfType));
+                
             }
+            
+            System.out.println(String.format("\n%d archivos", quantityOfFiles));
+            System.out.println(String.format("%d directorios", quantityOfDirectories));
+            System.out.println(String.format("%d K libres", TOTAL_STORAGE));
+            
         }
         else
         {
