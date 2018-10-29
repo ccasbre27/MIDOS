@@ -96,20 +96,22 @@ public class Setup
     
     private static void LoadCommands()
     {
-        commandsList.add(new Command(COMMAND_TYPE.CLS, "^CLS$", "Permite limpiar la pantalla de la consola"));
-        commandsList.add(new Command(COMMAND_TYPE.DATE, "^DATE$", "Despliega la fecha del sistema"));
-        commandsList.add(new Command(COMMAND_TYPE.TIME, "^TIME$", "Despliega la hora del sistema"));
-        commandsList.add(new Command(COMMAND_TYPE.MD, "MD [a-zA-Z]{1,}[a-zA-Z0-9]{0,7}", "Crea un directorio en la ruta actual"));
-        commandsList.add(new Command(COMMAND_TYPE.CD, "CD [a-zA-Z]{1,}[a-zA-Z0-9]{0,7}|CD [.]{2,2}|CD [\\\\]{1,1}", "Cambia al directorio especificado"));
-        commandsList.add(new Command(COMMAND_TYPE.VER, "^VER$", "Despliega la versión y espacio libre del sistema"));
-        commandsList.add(new Command(COMMAND_TYPE.DIR, "^DIR$", "Lista los archivos y directorios que hay en la dirección actual"));
-        commandsList.add(new Command(COMMAND_TYPE.RD, "RD [a-zA-Z]{1,}[a-zA-Z0-9]{0,7}", "Elimina un archivo o directorio con el nombre indicado en la ruta actual"));
-        commandsList.add(new Command(COMMAND_TYPE.PROMPT, "PROMPT|PROMPT \\$P|PROMPT \\$G|PROMPT \\$P \\$G|PROMPT \\$G \\$P", "Cambia la apariencia de la línea de comandos"));
-        commandsList.add(new Command(COMMAND_TYPE.COPY_CON, "COPY CON [a-zA-Z]{1,}[a-zA-Z0-9]{0,7}", "Crea un archivo en la ruta actual"));
-        commandsList.add(new Command(COMMAND_TYPE.TYPE, "TYPE [a-zA-Z]{1,}[a-zA-Z0-9]{0,7}", "Muestra el contenido del archivo especificado"));
-        commandsList.add(new Command(COMMAND_TYPE.DEL, "DEL [a-zA-Z]{1,}[a-zA-Z0-9]{0,7}", "Elimina archivo especificado"));
-        commandsList.add(new Command(COMMAND_TYPE.REN, "REN [a-zA-Z]{1,}[a-zA-Z0-9]{0,7} [a-zA-Z]{1,}[a-zA-Z0-9]{0,7}", "Cambia el nombre del archivo o directorio especificado"));
-        commandsList.add(new Command(COMMAND_TYPE.EXIT, "^EXIT$", "Finaliza el programa"));
+        // estamos agregando los espacios antes y después de los comandos, hay que seguir revisando los comando restantes para eso ver el
+        // bloc de notas
+        commandsList.add(new Command(COMMAND_TYPE.CLS,      "[ \\t]*CLS[ \\t]*", "Permite limpiar la pantalla de la consola"));
+        commandsList.add(new Command(COMMAND_TYPE.DATE,     "[ \\t]*DATE[ \\t]*", "Despliega la fecha del sistema"));
+        commandsList.add(new Command(COMMAND_TYPE.TIME,     "[ \\t]*TIME[ \\t]*", "Despliega la hora del sistema"));
+        commandsList.add(new Command(COMMAND_TYPE.MD,       "[ \\t]*MD[ \\t]+[a-zA-Z]{1,}[a-zA-Z0-9]{0,7}[ \\t]*", "Crea un directorio en la ruta actual"));
+        commandsList.add(new Command(COMMAND_TYPE.CD,       "[ \\t]*CD[ \\t]+[a-zA-Z]{1,}[a-zA-Z0-9]{0,7}[ \\t]*|[ \\t]*CD[ \\t]+[.]{2,2}[ \\t]*|[ \\t]*CD[ \\t]+[\\\\]{1,1}[ \\t]*", "Cambia al directorio especificado"));
+        commandsList.add(new Command(COMMAND_TYPE.VER,      "[ \\t]*VER[ \\t]*", "Despliega la versión y espacio libre del sistema"));
+        commandsList.add(new Command(COMMAND_TYPE.DIR,      "[ \\t]*DIR[ \\t]*", "Lista los archivos y directorios que hay en la dirección actual"));
+        commandsList.add(new Command(COMMAND_TYPE.RD,       "[ \\t]*RD[ \\t]+[a-zA-Z]{1,}[a-zA-Z0-9]{0,7}[ \\t]*", "Elimina un directorio con el nombre indicado en la ruta actual"));
+        commandsList.add(new Command(COMMAND_TYPE.PROMPT,   "[ \\t]*PROMPT[ \\t]*|[ \\t]*PROMPT[ \\t]+\\$P[ \\t]*|[ \\t]*PROMPT[ \\t]+\\$G[ \\t]*|[ \\t]*PROMPT[ \\t]+\\$P[ \\t]*\\$G[ \\t]*|[ \\t]*PROMPT[ \\t]+\\$G[ \\t]*\\$P[ \\t]*", "Cambia la apariencia de la línea de comandos"));
+        commandsList.add(new Command(COMMAND_TYPE.COPY_CON, "[ \\t]*COPY[ \\t]+CON[ \\t]+[a-zA-Z]{1,}[a-zA-Z0-9]{0,7}[ \\t]*", "Crea un archivo en la ruta actual"));
+        commandsList.add(new Command(COMMAND_TYPE.TYPE,     "[ \\t]*TYPE[ \\t]+[a-zA-Z]{1,}[a-zA-Z0-9]{0,7}[ \\t]*", "Muestra el contenido del archivo especificado"));
+        commandsList.add(new Command(COMMAND_TYPE.DEL,      "[ \\t]*DEL[ \\t]+[a-zA-Z]{1,}[a-zA-Z0-9]{0,7}[ \\t]*", "Elimina archivo especificado"));
+        commandsList.add(new Command(COMMAND_TYPE.REN,      "[ \\t]*REN[ \\t]+[a-zA-Z]{1,}[a-zA-Z0-9]{0,7}[ \\t]+[a-zA-Z]{1,}[a-zA-Z0-9]{0,7}[ \\t]*", "Cambia el nombre del archivo o directorio especificado"));
+        commandsList.add(new Command(COMMAND_TYPE.EXIT,     "[ \\t]*EXIT[ \\t]*", "Finaliza el programa"));
         
     }
     
@@ -159,10 +161,11 @@ public class Setup
     private static void CheckCommand(String commandToSearch)
     {
         boolean isValidCommand = false;
-       
+        
         
         for (Command command : commandsList)
         {
+            commandToSearch = commandToSearch.trim();
             
             if (commandToSearch.toUpperCase().matches(command.getPatternAccepted())) 
             {
@@ -486,7 +489,6 @@ public class Setup
         else
         {
             
-        
             switch (itemType)
             {
                 case DIRECTORY:
@@ -695,19 +697,19 @@ public class Setup
         {
             commandLineType = COMMAND_LINE_TYPE.PROMPT;
         }
-        else if(commandToSearch.toUpperCase().matches("PROMPT \\$P"))
+        else if(commandToSearch.toUpperCase().matches("PROMPT[ \\t]*\\$P"))
         {
             commandLineType = COMMAND_LINE_TYPE.PROMPT_P;
         }
-        else if(commandToSearch.toUpperCase().matches("PROMPT \\$G"))
+        else if(commandToSearch.toUpperCase().matches("PROMPT[ \\t]*\\$G"))
         {
             commandLineType = COMMAND_LINE_TYPE.PROMPT_G;
         }
-        else if(commandToSearch.toUpperCase().matches("PROMPT \\$P \\$G"))
+        else if(commandToSearch.toUpperCase().matches("PROMPT[ \\t]+\\$P[ \\t]*\\$G"))
         {
             commandLineType = COMMAND_LINE_TYPE.PROMPT_PG;
         }
-        else if(commandToSearch.toUpperCase().matches("PROMPT \\$G \\$P"))
+        else if(commandToSearch.toUpperCase().matches("PROMPT[ \\t]+\\$G[ \\t]*\\$P"))
         {
             commandLineType = COMMAND_LINE_TYPE.PROMPT_GP;
         }
@@ -818,12 +820,12 @@ public class Setup
              // se verifica si desea salir del sistema
             System.out.print("¿Está seguro que desea salir de MIDOS (S/N) ?");
 
-            String selectedOption = scanner.next();
+            String selectedOption = scanner.next().trim();
 
             if (selectedOption.equalsIgnoreCase("S")) 
             {
                 System.out.println("El programa va finalizar\n¡Te esperamos de vuelta pronto!");
-                exit = false;
+                exit = true;
                 stopAskingCorrectOption = false;
             }
             else
