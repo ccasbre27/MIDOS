@@ -54,6 +54,11 @@ public class Setup
     
     static Scanner scanner = null;
     
+    // mensaje que se va desplegar al usuario con la información de la memoria restante 
+    static String versionMessage = "\nMINGOSOFT ® MIDOS \n" +
+                            "© Copyright MINGOSOFT CORPORATION 2018\n" +
+                            "Versión 1.0 Memoria libre: %d K Autor: Carlos Castro Brenes - Cédula: 1-1596-0319\n";
+    
     public static void main (String [] args) throws IOException
     {
         String optionEntered = "";
@@ -68,19 +73,20 @@ public class Setup
        
         LoadStorage();
         LoadItems();
+        DisplayVersion();
+        DisplayPath();
         
         // se debe repetir hasta que el usuario desee salir mediante el comando EXIT
         do 
         {
             optionEntered = "";
 
-            DisplayVersion();
-
             optionEntered = scanner.nextLine();
 
             // se verifica si el texto ingresado corresponde a un comando
             CheckCommand(optionEntered);
-
+            
+            DisplayPath();
         } 
         while (!exit);
         
@@ -128,34 +134,33 @@ public class Setup
         return "";
     }
     
-      private static void DisplayVersion()
+    private static void DisplayVersion()
     {
-        // mensaje que se va desplegar al usuario con la información de la memoria restante 
-        String versionMessage = "\nMINGOSOFT ® MIDOS \n" +
-                            "© Copyright MINGOSOFT CORPORATION 2018\n" +
-                            "Versión 1.0 Memoria libre: %d K Autor: Carlos Castro Brenes - Cédula: 1-1596-0319\n";
-        
+       
+        System.out.print(String.format(versionMessage, TOTAL_STORAGE));
+    }
+      
+    private static void DisplayPath()
+    {
         switch (commandLineType)
         {
             case PROMPT:
             case PROMPT_PG:
-                versionMessage += path + ">";
+                System.out.print(path + ">");
                 break;
                 
             case PROMPT_P:
-                versionMessage += path;
+                System.out.print(path);
                 break;
                 
             case PROMPT_G:
-                versionMessage += ">";
+                System.out.print(">");
                 break;
            
             case PROMPT_GP:
-                versionMessage += ">" + path;
+                System.out.print(">" + path);
                 break;
         }
-                            
-        System.out.print(String.format(versionMessage, TOTAL_STORAGE));
     }
     
     private static void CheckCommand(String commandToSearch)
@@ -237,7 +242,8 @@ public class Setup
             
         }
         
-        if (!isValidCommand) 
+        // !commandToSearch.isEmpty() permite línea vacías
+        if (!isValidCommand && !commandToSearch.isEmpty()) 
         {
             System.out.println(GetErrorMessage(INFORMATION_CODE.COMMAND_NOT_FOUND));
         }
@@ -485,6 +491,10 @@ public class Setup
         if (currentItem.nextItems.size() >= 8) 
         {
             System.out.println("Ya se ha alcanzado la cantidad máxima de archivos y directorios (8 como máximo entre los dos), elimine alguno si desea crear otro");
+        }
+        else if (name.length() > 8)
+        {
+            System.out.println("El nombre debe tener como máximo 8 caracteres");
         }
         else
         {

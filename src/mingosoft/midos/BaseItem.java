@@ -72,7 +72,7 @@ public class BaseItem implements Serializable
         
         final BaseItem receivedItem = (BaseItem) obj;
         
-        return Objects.equals(this.name, receivedItem.name) && Objects.equals(this.type, receivedItem.type);
+        return Objects.equals(this.name.toUpperCase(), receivedItem.name.toUpperCase()) && Objects.equals(this.type, receivedItem.type);
     }
 
 }
