@@ -108,7 +108,7 @@ public class Setup
         commandsList.add(new Command(COMMAND_TYPE.DATE,     "[ \\t]*DATE[ \\t]*", "Despliega la fecha del sistema"));
         commandsList.add(new Command(COMMAND_TYPE.TIME,     "[ \\t]*TIME[ \\t]*", "Despliega la hora del sistema"));
         commandsList.add(new Command(COMMAND_TYPE.MD,       "[ \\t]*MD[ \\t]+[a-zA-Z]{1,}[a-zA-Z0-9]{0,7}[ \\t]*", "Crea un directorio en la ruta actual"));
-        commandsList.add(new Command(COMMAND_TYPE.CD,       "[ \\t]*CD[ \\t]+[a-zA-Z]{1,}[a-zA-Z0-9]{0,7}[ \\t]*|[ \\t]*CD[ \\t]+[.]{2,2}[ \\t]*|[ \\t]*CD[ \\t]+[\\\\]{1,1}[ \\t]*", "Cambia al directorio especificado"));
+        commandsList.add(new Command(COMMAND_TYPE.CD,       "[ \\t]*CD[ \\t]+[a-zA-Z]{1,}[a-zA-Z0-9]{0,7}[ \\t]*|[ \\t]*CD[ \\t]*[.]{2,2}[ \\t]*|[ \\t]*CD[ \\t]*[\\\\]{1,1}[ \\t]*", "Cambia al directorio especificado"));
         commandsList.add(new Command(COMMAND_TYPE.VER,      "[ \\t]*VER[ \\t]*", "Despliega la versión y espacio libre del sistema"));
         commandsList.add(new Command(COMMAND_TYPE.DIR,      "[ \\t]*DIR[ \\t]*", "Lista los archivos y directorios que hay en la dirección actual"));
         commandsList.add(new Command(COMMAND_TYPE.RD,       "[ \\t]*RD[ \\t]+[a-zA-Z]{1,}[a-zA-Z0-9]{0,7}[ \\t]*", "Elimina un directorio con el nombre indicado en la ruta actual"));
@@ -142,6 +142,7 @@ public class Setup
       
     private static void DisplayPath()
     {
+        System.out.println();
         switch (commandLineType)
         {
             case PROMPT:
@@ -209,7 +210,7 @@ public class Setup
                         return;
                         
                     case CD:
-                        ChangeDirectory(commandToSearch.split("\\s+")[1]);
+                        ChangeDirectory(commandToSearch);
                         return;
                         
                     case PROMPT:
@@ -591,9 +592,11 @@ public class Setup
     
     private static void ChangeDirectory(String navigation)
     {
+       
+        String navigationType = navigation.toUpperCase().replace("CD", " ").trim();
         
         // verificamos si es una navegación hacia el padre
-        if (navigation.equals(".."))
+        if (navigationType.equals(".."))
         {
             // verificamos que el padre no sea nulo porque el directorio lo tiene nulo
             if (currentItem.previousItem != null)
@@ -614,7 +617,7 @@ public class Setup
                 System.out.println("Se encuentra en el directorio raíz, no se puede navegar hacia el directorio padre");
             }
         }
-        else if (navigation.equals("\\"))
+        else if (navigationType.equals("\\"))
         {
             // se quiere navegar al directorio padre
             currentItem = GetRootDirectory(currentItem);
@@ -623,7 +626,12 @@ public class Setup
         }
         else
         {
-            Directory item = (Directory) GetItem(navigation, ItemType.DIRECTORY);
+            
+            // no hace falta validar si se tiene acceso al índice porque si llegó acá
+            // es porque cumplió el regex y si no cae en las opciones anteriores cae en esta
+            String nameOfDirectory = navigation.split("\\s+")[1];
+        
+            Directory item = (Directory) GetItem(nameOfDirectory, ItemType.DIRECTORY);
         
             // verificamos si se encontró el ítem
             if (item != null)
@@ -636,7 +644,7 @@ public class Setup
                     currentItem = item;
 
                     // actualizamos la ruta actual en pantalla
-                    path = String.format("%s%s%s", path , navigation, "\\");
+                    path = String.format("%s%s%s", path , nameOfDirectory, "\\");
                 }
                 else
                 {
