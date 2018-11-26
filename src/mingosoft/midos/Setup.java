@@ -104,21 +104,21 @@ public class Setup
     {
         // estamos agregando los espacios antes y después de los comandos, hay que seguir revisando los comando restantes para eso ver el
         // bloc de notas
-        commandsList.add(new Command(COMMAND_TYPE.CLS,      "[ \\t]*CLS[ \\t]*", "Permite limpiar la pantalla de la consola"));
-        commandsList.add(new Command(COMMAND_TYPE.DATE,     "[ \\t]*DATE[ \\t]*", "Despliega la fecha del sistema"));
-        commandsList.add(new Command(COMMAND_TYPE.TIME,     "[ \\t]*TIME[ \\t]*", "Despliega la hora del sistema"));
-        commandsList.add(new Command(COMMAND_TYPE.MD,       "[ \\t]*MD[ \\t]+[a-zA-Z]{1,}[a-zA-Z0-9]{0,7}[ \\t]*", "Crea un directorio en la ruta actual"));
-        commandsList.add(new Command(COMMAND_TYPE.CD,       "[ \\t]*CD[ \\t]+[a-zA-Z]{1,}[a-zA-Z0-9]{0,7}[ \\t]*|[ \\t]*CD[ \\t]*[.]{2,2}[ \\t]*|[ \\t]*CD[ \\t]*[\\\\]{1,1}[ \\t]*", "Cambia al directorio especificado"));
-        commandsList.add(new Command(COMMAND_TYPE.VER,      "[ \\t]*VER[ \\t]*", "Despliega la versión y espacio libre del sistema"));
-        commandsList.add(new Command(COMMAND_TYPE.DIR,      "[ \\t]*DIR[ \\t]*", "Lista los archivos y directorios que hay en la dirección actual"));
-        commandsList.add(new Command(COMMAND_TYPE.RD,       "[ \\t]*RD[ \\t]+[a-zA-Z]{1,}[a-zA-Z0-9]{0,7}[ \\t]*", "Elimina un directorio con el nombre indicado en la ruta actual"));
-        commandsList.add(new Command(COMMAND_TYPE.PROMPT,   "[ \\t]*PROMPT[ \\t]*|[ \\t]*PROMPT[ \\t]+\\$P[ \\t]*|[ \\t]*PROMPT[ \\t]+\\$G[ \\t]*|[ \\t]*PROMPT[ \\t]+\\$P[ \\t]*\\$G[ \\t]*|[ \\t]*PROMPT[ \\t]+\\$G[ \\t]*\\$P[ \\t]*", "Cambia la apariencia de la línea de comandos"));
-        commandsList.add(new Command(COMMAND_TYPE.COPY_CON, "[ \\t]*COPY[ \\t]+CON[ \\t]+[a-zA-Z]{1,}[a-zA-Z0-9]{0,7}[ \\t]*", "Crea un archivo en la ruta actual"));
-        commandsList.add(new Command(COMMAND_TYPE.TYPE,     "[ \\t]*TYPE[ \\t]+[a-zA-Z]{1,}[a-zA-Z0-9]{0,7}[ \\t]*", "Muestra el contenido del archivo especificado"));
-        commandsList.add(new Command(COMMAND_TYPE.DEL,      "[ \\t]*DEL[ \\t]+[a-zA-Z]{1,}[a-zA-Z0-9]{0,7}[ \\t]*", "Elimina archivo especificado"));
-        commandsList.add(new Command(COMMAND_TYPE.REN,      "[ \\t]*REN[ \\t]+[a-zA-Z]{1,}[a-zA-Z0-9]{0,7}[ \\t]+[a-zA-Z]{1,}[a-zA-Z0-9]{0,7}[ \\t]*", "Cambia el nombre del archivo o directorio especificado"));
-        commandsList.add(new Command(COMMAND_TYPE.TREE,     "[ \\t]*TREE[ \\t]*", "Despliega la jerarquía de los directorios"));
-        commandsList.add(new Command(COMMAND_TYPE.EXIT,     "[ \\t]*EXIT[ \\t]*", "Finaliza el programa"));
+        commandsList.add(new Command(COMMAND_TYPE.CLS,      "[ \\t]*CLS[ \\t]*", "CLS", "Permite limpiar la pantalla de la consola", "Para ejecutar el comando debe ingresar CLS seguido de la tecla enter"));
+        commandsList.add(new Command(COMMAND_TYPE.DATE,     "[ \\t]*DATE[ \\t]*", "DATE", "Despliega la fecha del sistema", "Para ejecutar el comando debe ingresar DATE seguido de la tecla enter"));
+        commandsList.add(new Command(COMMAND_TYPE.TIME,     "[ \\t]*TIME[ \\t]*", "TIME", "Despliega la hora del sistema", "Para ejecutar el comando debe ingresar TIME seguido de la tecla enter"));
+        commandsList.add(new Command(COMMAND_TYPE.MD,       "[ \\t]*MD[ \\t]+[a-zA-Z]{1,}[a-zA-Z0-9]{0,7}[ \\t]*", "MD" ,"Crea un directorio en la ruta actual", "Para ejecutar el comando debe ingresar MD + espacio + nombre del directorio a crear seguido de la tecla enter, el nombre debe inicar con letras y puede contener números, su longitud es de 8 caracteres como máximo.\nPor ejemplo: MD directorio1"));
+        commandsList.add(new Command(COMMAND_TYPE.CD,       "[ \\t]*CD[ \\t]+[a-zA-Z]{1,}[a-zA-Z0-9]{0,7}[ \\t]*|[ \\t]*CD[ \\t]*[.]{2,2}[ \\t]*|[ \\t]*CD[ \\t]*[\\\\]{1,1}[ \\t]*", "CD" ,"Cambia al directorio especificado", "Para ejecutar el comando debe ingresar CD + espacio + nombre del directorio a cambiar seguido de la tecla enter, el nombre debe inicar con letras y puede contener números, su longitud es de 8 caracteres como máximo.\nPor ejemplo: CD directorio1"));
+        commandsList.add(new Command(COMMAND_TYPE.VER,      "[ \\t]*VER[ \\t]*", "VER" ,"Despliega la versión y espacio libre del sistema", "Para ejecutar el comando debe ingresar VER seguido de la tecla enter"));
+        commandsList.add(new Command(COMMAND_TYPE.DIR,      "[ \\t]*DIR[ \\t]*", "DIR" ,"Lista los archivos y directorios que hay en la dirección actual", "Para ejecutar el comando debe ingresar DIR seguido de la tecla enter"));
+        commandsList.add(new Command(COMMAND_TYPE.RD,       "[ \\t]*RD[ \\t]+[a-zA-Z]{1,}[a-zA-Z0-9]{0,7}[ \\t]*", "RD" ,"Elimina un directorio con el nombre indicado en la ruta actual", "Para ejecutar el comando debe ingresar RD + espacio + nombre del directorio a eliminar seguido de la tecla enter.\nPor ejemplo: RD directorio1"));
+        commandsList.add(new Command(COMMAND_TYPE.PROMPT,   "[ \\t]*PROMPT[ \\t]*|[ \\t]*PROMPT[ \\t]+\\$P[ \\t]*|[ \\t]*PROMPT[ \\t]+\\$G[ \\t]*|[ \\t]*PROMPT[ \\t]+\\$P[ \\t]*\\$G[ \\t]*|[ \\t]*PROMPT[ \\t]+\\$G[ \\t]*\\$P[ \\t]*", "PROMPT" ,"Cambia la apariencia de la línea de comandos", "Para ejecutar el comando debe ingresar PROMPT seguido de la tecla enter"));
+        commandsList.add(new Command(COMMAND_TYPE.COPY_CON, "[ \\t]*COPY[ \\t]+CON[ \\t]+[a-zA-Z]{1,}[a-zA-Z0-9]{0,7}[ \\t]*", "COPY" ,"Crea un archivo en la ruta actual", "Para ejecutar el comando debe ingresar COPY + espacio + CON + nombre del archivo a crear seguido de la tecla enter, el nombre debe inicar con letras y puede contener números, su longitud es de 8 caracteres como máximo.\nPor ejemplo: COPY CON archivo1"));
+        commandsList.add(new Command(COMMAND_TYPE.TYPE,     "[ \\t]*TYPE[ \\t]+[a-zA-Z]{1,}[a-zA-Z0-9]{0,7}[ \\t]*", "TYPE", "Muestra el contenido del archivo especificado", "Para ejecutar el comando debe ingresar TYPE + espacio + nombre del archivo seguido de la tecla enter, el nombre debe inicar con letras y puede contener números, su longitud es de 8 caracteres como máximo.\nPor ejemplo: TYPE archivo1"));
+        commandsList.add(new Command(COMMAND_TYPE.DEL,      "[ \\t]*DEL[ \\t]+[a-zA-Z]{1,}[a-zA-Z0-9]{0,7}[ \\t]*", "DEL", "Elimina archivo especificado", "Para ejecutar el comando debe ingresar DEL + espacio + nombre del archivo a eliminar seguido de la tecla enter, el nombre debe inicar con letras y puede contener números, su longitud es de 8 caracteres como máximo.\nPor ejemplo: DEL archivo1"));
+        commandsList.add(new Command(COMMAND_TYPE.REN,      "[ \\t]*REN[ \\t]+[a-zA-Z]{1,}[a-zA-Z0-9]{0,7}[ \\t]+[a-zA-Z]{1,}[a-zA-Z0-9]{0,7}[ \\t]*", "REN" , "Cambia el nombre del archivo o directorio especificado", "Para ejecutar el comando debe ingresar REN + espacio + nombre del archivo del que se desea cambiar el nombre + espacio + nuevo nombre seguido de la tecla enter, el nombre debe inicar con letras y puede contener números, su longitud es de 8 caracteres como máximo.\nPor ejemplo: REN archivo1 miarchivo"));
+        commandsList.add(new Command(COMMAND_TYPE.TREE,     "[ \\t]*TREE[ \\t]*", "TREE", "Despliega la jerarquía de los directorios", "Para ejecutar el comando debe ingresar TREE seguido de la tecla enter"));
+        commandsList.add(new Command(COMMAND_TYPE.EXIT,     "[ \\t]*EXIT[ \\t]*", "EXIT", "Finaliza el programa", "Para ejecutar el comando debe ingresar EXIT seguido de la tecla enter"));
         
     }
     
@@ -168,13 +168,14 @@ public class Setup
     private static void CheckCommand(String commandToSearch)
     {
         boolean isValidCommand = false;
+        boolean isMistyped = false;
         
         
         for (Command command : commandsList)
         {
             commandToSearch = commandToSearch.trim();
             
-            if (commandToSearch.toUpperCase().matches(command.getPatternAccepted())) 
+            if (commandToSearch.toUpperCase().matches(command.getAcceptedPattern())) 
             {
                 isValidCommand = true;
                 
@@ -245,12 +246,17 @@ public class Setup
                         
                 }
             }
-            
+            else if (commandToSearch.trim().toUpperCase().startsWith(command.getAcceptedKeyWord()))
+            {
+                isMistyped = true;
+                System.out.println(command.getHelp());
+            }
         }
         
         // !commandToSearch.isEmpty() permite línea vacías
-        if (!isValidCommand && !commandToSearch.isEmpty()) 
+        if (!isValidCommand && !commandToSearch.isEmpty() && !isMistyped) 
         {
+            // se verifica si se ingresaron mal los parámetros de un comando para indicarle cómo se debe utilizar
             System.out.println(GetErrorMessage(INFORMATION_CODE.COMMAND_NOT_FOUND));
         }
        

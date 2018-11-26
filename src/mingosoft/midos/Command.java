@@ -12,13 +12,17 @@ package mingosoft.midos;
 public class Command 
 {
     private COMMAND_TYPE commandType;
-    private String patternAccepted;
+    private String acceptedPattern;
+    private String acceptedKeyWord;
     private String description;
+    private String help;
 
-    public Command(COMMAND_TYPE commandType, String patternAccepted, String description) {
+    public Command(COMMAND_TYPE commandType, String patternAccepted, String acceptedKeyWord ,String description, String help) {
         this.commandType = commandType;
-        this.patternAccepted = patternAccepted;
+        this.acceptedPattern = patternAccepted;
+        this.acceptedKeyWord = acceptedKeyWord;
         this.description = description;
+        this.help = help;
     }
 
     public COMMAND_TYPE getCommandType() {
@@ -29,14 +33,22 @@ public class Command
         this.commandType = commandType;
     }
 
-    public String getPatternAccepted() {
-        return patternAccepted;
+    public String getAcceptedPattern() {
+        return acceptedPattern;
     }
 
-    public void setPatternAccepted(String patternAccepted) {
-        this.patternAccepted = patternAccepted;
+    public void setAcceptedPattern(String patternAccepted) {
+        this.acceptedPattern = patternAccepted;
     }
 
+    public String getAcceptedKeyWord() {
+        return acceptedKeyWord;
+    }
+
+    public void setAcceptedKeyWord(String acceptedKeyWord) {
+        this.acceptedKeyWord = acceptedKeyWord;
+    }
+    
     public String getDescription() {
         return description;
     }
@@ -44,6 +56,13 @@ public class Command
     public void setDescription(String description) {
         this.description = description;
     }
-    
+
+    public String getHelp() {
+        return help;
+    }
+
+    public void setHelp(String help) {
+        this.help = help;
+    }
     
 }
