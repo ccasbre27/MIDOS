@@ -104,21 +104,21 @@ public class Setup
     {
         // estamos agregando los espacios antes y después de los comandos, hay que seguir revisando los comando restantes para eso ver el
         // bloc de notas
-        commandsList.add(new Command(COMMAND_TYPE.CLS,      "[ \\t]*CLS[ \\t]*", "CLS", "Permite limpiar la pantalla de la consola", "Para ejecutar el comando debe ingresar CLS seguido de la tecla enter"));
-        commandsList.add(new Command(COMMAND_TYPE.DATE,     "[ \\t]*DATE[ \\t]*", "DATE", "Despliega la fecha del sistema", "Para ejecutar el comando debe ingresar DATE seguido de la tecla enter"));
-        commandsList.add(new Command(COMMAND_TYPE.TIME,     "[ \\t]*TIME[ \\t]*", "TIME", "Despliega la hora del sistema", "Para ejecutar el comando debe ingresar TIME seguido de la tecla enter"));
+        commandsList.add(new Command(COMMAND_TYPE.CLS,      "[ \\t]*CLS[ \\t]*", "CL", "Permite limpiar la pantalla de la consola", "Para ejecutar el comando debe ingresar CLS seguido de la tecla enter"));
+        commandsList.add(new Command(COMMAND_TYPE.DATE,     "[ \\t]*DATE[ \\t]*", "DA", "Despliega la fecha del sistema", "Para ejecutar el comando debe ingresar DATE seguido de la tecla enter"));
+        commandsList.add(new Command(COMMAND_TYPE.TIME,     "[ \\t]*TIME[ \\t]*", "TI", "Despliega la hora del sistema", "Para ejecutar el comando debe ingresar TIME seguido de la tecla enter"));
         commandsList.add(new Command(COMMAND_TYPE.MD,       "[ \\t]*MD[ \\t]+[a-zA-Z]{1,}[a-zA-Z0-9]{0,7}[ \\t]*", "MD" ,"Crea un directorio en la ruta actual", "Para ejecutar el comando debe ingresar MD + espacio + nombre del directorio a crear seguido de la tecla enter, el nombre debe inicar con letras y puede contener números, su longitud es de 8 caracteres como máximo.\nPor ejemplo: MD directorio1"));
         commandsList.add(new Command(COMMAND_TYPE.CD,       "[ \\t]*CD[ \\t]+[a-zA-Z]{1,}[a-zA-Z0-9]{0,7}[ \\t]*|[ \\t]*CD[ \\t]*[.]{2,2}[ \\t]*|[ \\t]*CD[ \\t]*[\\\\]{1,1}[ \\t]*", "CD" ,"Cambia al directorio especificado", "Para ejecutar el comando debe ingresar CD + espacio + nombre del directorio a cambiar seguido de la tecla enter, el nombre debe inicar con letras y puede contener números, su longitud es de 8 caracteres como máximo.\nPor ejemplo: CD directorio1"));
-        commandsList.add(new Command(COMMAND_TYPE.VER,      "[ \\t]*VER[ \\t]*", "VER" ,"Despliega la versión y espacio libre del sistema", "Para ejecutar el comando debe ingresar VER seguido de la tecla enter"));
-        commandsList.add(new Command(COMMAND_TYPE.DIR,      "[ \\t]*DIR[ \\t]*", "DIR" ,"Lista los archivos y directorios que hay en la dirección actual", "Para ejecutar el comando debe ingresar DIR seguido de la tecla enter"));
+        commandsList.add(new Command(COMMAND_TYPE.VER,      "[ \\t]*VER[ \\t]*", "VE" ,"Despliega la versión y espacio libre del sistema", "Para ejecutar el comando debe ingresar VER seguido de la tecla enter"));
+        commandsList.add(new Command(COMMAND_TYPE.DIR,      "[ \\t]*DIR[ \\t]*", "DI" ,"Lista los archivos y directorios que hay en la dirección actual", "Para ejecutar el comando debe ingresar DIR seguido de la tecla enter"));
         commandsList.add(new Command(COMMAND_TYPE.RD,       "[ \\t]*RD[ \\t]+[a-zA-Z]{1,}[a-zA-Z0-9]{0,7}[ \\t]*", "RD" ,"Elimina un directorio con el nombre indicado en la ruta actual", "Para ejecutar el comando debe ingresar RD + espacio + nombre del directorio a eliminar seguido de la tecla enter.\nPor ejemplo: RD directorio1"));
-        commandsList.add(new Command(COMMAND_TYPE.PROMPT,   "[ \\t]*PROMPT[ \\t]*|[ \\t]*PROMPT[ \\t]+\\$P[ \\t]*|[ \\t]*PROMPT[ \\t]+\\$G[ \\t]*|[ \\t]*PROMPT[ \\t]+\\$P[ \\t]*\\$G[ \\t]*|[ \\t]*PROMPT[ \\t]+\\$G[ \\t]*\\$P[ \\t]*", "PROMPT" ,"Cambia la apariencia de la línea de comandos", "Para ejecutar el comando debe ingresar PROMPT seguido de la tecla enter"));
-        commandsList.add(new Command(COMMAND_TYPE.COPY_CON, "[ \\t]*COPY[ \\t]+CON[ \\t]+[a-zA-Z]{1,}[a-zA-Z0-9]{0,7}[ \\t]*", "COPY" ,"Crea un archivo en la ruta actual", "Para ejecutar el comando debe ingresar COPY + espacio + CON + nombre del archivo a crear seguido de la tecla enter, el nombre debe inicar con letras y puede contener números, su longitud es de 8 caracteres como máximo.\nPor ejemplo: COPY CON archivo1"));
-        commandsList.add(new Command(COMMAND_TYPE.TYPE,     "[ \\t]*TYPE[ \\t]+[a-zA-Z]{1,}[a-zA-Z0-9]{0,7}[ \\t]*", "TYPE", "Muestra el contenido del archivo especificado", "Para ejecutar el comando debe ingresar TYPE + espacio + nombre del archivo seguido de la tecla enter, el nombre debe inicar con letras y puede contener números, su longitud es de 8 caracteres como máximo.\nPor ejemplo: TYPE archivo1"));
-        commandsList.add(new Command(COMMAND_TYPE.DEL,      "[ \\t]*DEL[ \\t]+[a-zA-Z]{1,}[a-zA-Z0-9]{0,7}[ \\t]*", "DEL", "Elimina archivo especificado", "Para ejecutar el comando debe ingresar DEL + espacio + nombre del archivo a eliminar seguido de la tecla enter, el nombre debe inicar con letras y puede contener números, su longitud es de 8 caracteres como máximo.\nPor ejemplo: DEL archivo1"));
-        commandsList.add(new Command(COMMAND_TYPE.REN,      "[ \\t]*REN[ \\t]+[a-zA-Z]{1,}[a-zA-Z0-9]{0,7}[ \\t]+[a-zA-Z]{1,}[a-zA-Z0-9]{0,7}[ \\t]*", "REN" , "Cambia el nombre del archivo o directorio especificado", "Para ejecutar el comando debe ingresar REN + espacio + nombre del archivo del que se desea cambiar el nombre + espacio + nuevo nombre seguido de la tecla enter, el nombre debe inicar con letras y puede contener números, su longitud es de 8 caracteres como máximo.\nPor ejemplo: REN archivo1 miarchivo"));
-        commandsList.add(new Command(COMMAND_TYPE.TREE,     "[ \\t]*TREE[ \\t]*", "TREE", "Despliega la jerarquía de los directorios", "Para ejecutar el comando debe ingresar TREE seguido de la tecla enter"));
-        commandsList.add(new Command(COMMAND_TYPE.EXIT,     "[ \\t]*EXIT[ \\t]*", "EXIT", "Finaliza el programa", "Para ejecutar el comando debe ingresar EXIT seguido de la tecla enter"));
+        commandsList.add(new Command(COMMAND_TYPE.PROMPT,   "[ \\t]*PROMPT[ \\t]*|[ \\t]*PROMPT[ \\t]+\\$P[ \\t]*|[ \\t]*PROMPT[ \\t]+\\$G[ \\t]*|[ \\t]*PROMPT[ \\t]+\\$P[ \\t]*\\$G[ \\t]*|[ \\t]*PROMPT[ \\t]+\\$G[ \\t]*\\$P[ \\t]*", "PR" ,"Cambia la apariencia de la línea de comandos", "Para ejecutar el comando debe ingresar PROMPT seguido de la tecla enter"));
+        commandsList.add(new Command(COMMAND_TYPE.COPY_CON, "[ \\t]*COPY[ \\t]+CON[ \\t]+[a-zA-Z]{1,}[a-zA-Z0-9]{0,7}[ \\t]*", "CO" ,"Crea un archivo en la ruta actual", "Para ejecutar el comando debe ingresar COPY + espacio + CON + nombre del archivo a crear seguido de la tecla enter, el nombre debe inicar con letras y puede contener números, su longitud es de 8 caracteres como máximo.\nPor ejemplo: COPY CON archivo1"));
+        commandsList.add(new Command(COMMAND_TYPE.TYPE,     "[ \\t]*TYPE[ \\t]+[a-zA-Z]{1,}[a-zA-Z0-9]{0,7}[ \\t]*", "TY", "Muestra el contenido del archivo especificado", "Para ejecutar el comando debe ingresar TYPE + espacio + nombre del archivo seguido de la tecla enter, el nombre debe inicar con letras y puede contener números, su longitud es de 8 caracteres como máximo.\nPor ejemplo: TYPE archivo1"));
+        commandsList.add(new Command(COMMAND_TYPE.DEL,      "[ \\t]*DEL[ \\t]+[a-zA-Z]{1,}[a-zA-Z0-9]{0,7}[ \\t]*", "DE", "Elimina archivo especificado", "Para ejecutar el comando debe ingresar DEL + espacio + nombre del archivo a eliminar seguido de la tecla enter, el nombre debe inicar con letras y puede contener números, su longitud es de 8 caracteres como máximo.\nPor ejemplo: DEL archivo1"));
+        commandsList.add(new Command(COMMAND_TYPE.REN,      "[ \\t]*REN[ \\t]+[a-zA-Z]{1,}[a-zA-Z0-9]{0,7}[ \\t]+[a-zA-Z]{1,}[a-zA-Z0-9]{0,7}[ \\t]*", "RE" , "Cambia el nombre del archivo o directorio especificado", "Para ejecutar el comando debe ingresar REN + espacio + nombre del archivo del que se desea cambiar el nombre + espacio + nuevo nombre seguido de la tecla enter, el nombre debe inicar con letras y puede contener números, su longitud es de 8 caracteres como máximo.\nPor ejemplo: REN archivo1 miarchivo"));
+        commandsList.add(new Command(COMMAND_TYPE.TREE,     "[ \\t]*TREE[ \\t]*", "TR", "Despliega la jerarquía de los directorios", "Para ejecutar el comando debe ingresar TREE seguido de la tecla enter"));
+        commandsList.add(new Command(COMMAND_TYPE.EXIT,     "[ \\t]*EXIT[ \\t]*", "EX", "Finaliza el programa", "Para ejecutar el comando debe ingresar EXIT seguido de la tecla enter"));
         
     }
     
@@ -232,8 +232,14 @@ public class Setup
                         return;
                         
                     case REN:
-                        String [] names = commandToSearch.split("\\s+");
+                        try{
+                            String [] names = commandToSearch.split("\\s+");
                         RenameItem(names[1], names[2]);
+                        }catch (Exception e)
+                        {
+                            throw e;
+                        }
+                        
                         return;
                         
                     case TREE:
@@ -796,46 +802,56 @@ public class Setup
     
     private static void RenameItem(String oldName, String newName)
     {
-        // verificamos si existe el archivo o directorio
-        if (SearchItem(oldName, ItemType.DEFAULT)) 
+        // verificamos si el nombre no excede la cantida de caracteres
+        if (newName.length() > 8)
         {
-            
-            // verificamos si ya existe un directorio con el nuevo nombre
-            if (SearchItem(newName, ItemType.DEFAULT))  
-            {
-                System.out.println("Ya existe un archivo o directorio con el nuevo nombre");
-            }
-            else
-            {
-                // si lo encuentra vamos a buscarlo
-                int directoryPosition = currentItem.nextItems.indexOf(new Directory(oldName, ItemType.DIRECTORY));
-                int filePosition = currentItem.nextItems.indexOf(new CustomFile(oldName, ItemType.FILE));
-
-                // -1 indica que no se encontró
-                if (directoryPosition > -1) 
-                {
-                    Directory directory = (Directory) currentItem.nextItems.get(directoryPosition);
-                    directory.setName(newName);
-                    currentItem.nextItems.set(directoryPosition, directory);
-
-                }
-                else if (filePosition > -1)
-                {
-                    CustomFile customFile = (CustomFile) currentItem.nextItems.get(filePosition);
-                    customFile.setName(newName);
-                    currentItem.nextItems.set(directoryPosition, customFile);
-                }
-
-                // se escribe el estado actual de los directorios
-                WriteItems();
-
-                System.out.println("El nombre se ha cambiado exitosamente");
-            }
-            
+            System.out.println("El nombre debe tener como máximo 8 caracteres");
         }
         else
         {
-            System.out.println("No se ha encontrado el archivo o directorio con el nombre especificado");
+            
+             // verificamos si existe el archivo o directorio
+            if (SearchItem(oldName, ItemType.DEFAULT)) 
+            {
+
+                // verificamos si ya existe un directorio con el nuevo nombre
+                if (SearchItem(newName, ItemType.DEFAULT))  
+                {
+                    System.out.println("Ya existe un archivo o directorio con el nuevo nombre");
+                }
+                else
+                {
+                    // si lo encuentra vamos a buscarlo
+                    int directoryPosition = currentItem.nextItems.indexOf(new Directory(oldName, ItemType.DIRECTORY));
+                    int filePosition = currentItem.nextItems.indexOf(new CustomFile(oldName, ItemType.FILE));
+
+                    // -1 indica que no se encontró
+                    if (directoryPosition > -1) 
+                    {
+                        Directory directory = (Directory) currentItem.nextItems.get(directoryPosition);
+                        directory.setName(newName);
+                        currentItem.nextItems.set(directoryPosition, directory);
+
+                    }
+                    else if (filePosition > -1)
+                    {
+                        CustomFile customFile = (CustomFile) currentItem.nextItems.get(filePosition);
+                        customFile.setName(newName);
+                        currentItem.nextItems.set(filePosition, customFile);
+                    }
+
+                    // se escribe el estado actual de los directorios
+                    WriteItems();
+
+                    System.out.println("El nombre se ha cambiado exitosamente");
+                }
+
+            }
+            else
+            {
+                System.out.println("No se ha encontrado el archivo o directorio con el nombre especificado");
+            }
+
         }
     }
     
