@@ -117,6 +117,7 @@ public class Setup
         commandsList.add(new Command(COMMAND_TYPE.TYPE,     "[ \\t]*TYPE[ \\t]+[a-zA-Z]{1,}[a-zA-Z0-9]{0,7}[ \\t]*", "Muestra el contenido del archivo especificado"));
         commandsList.add(new Command(COMMAND_TYPE.DEL,      "[ \\t]*DEL[ \\t]+[a-zA-Z]{1,}[a-zA-Z0-9]{0,7}[ \\t]*", "Elimina archivo especificado"));
         commandsList.add(new Command(COMMAND_TYPE.REN,      "[ \\t]*REN[ \\t]+[a-zA-Z]{1,}[a-zA-Z0-9]{0,7}[ \\t]+[a-zA-Z]{1,}[a-zA-Z0-9]{0,7}[ \\t]*", "Cambia el nombre del archivo o directorio especificado"));
+        commandsList.add(new Command(COMMAND_TYPE.TREE,     "[ \\t]*TREE[ \\t]*", "Despliega la jerarquía de los directorios"));
         commandsList.add(new Command(COMMAND_TYPE.EXIT,     "[ \\t]*EXIT[ \\t]*", "Finaliza el programa"));
         
     }
@@ -232,6 +233,10 @@ public class Setup
                     case REN:
                         String [] names = commandToSearch.split("\\s+");
                         RenameItem(names[1], names[2]);
+                        return;
+                        
+                    case TREE:
+                        DisplayAllFiles();
                         return;
                             
                     case EXIT:
@@ -354,16 +359,17 @@ public class Setup
         }
     }
     
-    private static void SortItemsByName()
+    private static void SortItemsByName(Directory directory)
     {
         // creamos un comparador de tipo object para ordenar alfabéticamente
-        Collections.sort(currentItem.nextItems, new Comparator<Object>() {
+        Collections.sort(directory.nextItems, new Comparator<Object>() {
             public int compare(Object firstObject, Object secondObject) {
             
                 // como son de tipo object entonces hacemos un casting para poder acceder a las propiedades
                 return ((BaseItem)firstObject).getName().compareTo(((BaseItem)secondObject).getName());
             }
          });
+        
     }
     
     private static void ListDirectories()
@@ -372,8 +378,7 @@ public class Setup
         if (currentItem.nextItems.size() > 0)
         {
             // ordenamos los ítems alfabéticamente
-            SortItemsByName();
-            
+            SortItemsByName(currentItem);
             System.out.println("\nDirectorio de " + path);
             
             String nameOfType = "";
@@ -825,6 +830,51 @@ public class Setup
         else
         {
             System.out.println("No se ha encontrado el archivo o directorio con el nombre especificado");
+        }
+    }
+    
+    private static void PrintDirectory(Object directory, String tabulation)
+    {
+        Directory directoryToIterate = (Directory) directory;
+        
+        // ordenamos la colección actual
+        SortItemsByName(directoryToIterate);
+        
+        for (Object item : directoryToIterate.nextItems) 
+        {
+            BaseItem baseItem = (BaseItem) item;
+            
+            System.out.println(tabulation + baseItem.name);
+
+            // verificamos si el ítem actual es un directorio, si es así debemos ingresar a él e iterar
+            if (baseItem.getType() == ItemType.DIRECTORY) 
+            {
+                PrintDirectory(item, tabulation + " ");
+            }
+            
+        }
+    }
+    
+    private static void DisplayAllFiles()
+    {
+        // almacena temporalmente el directorio raíz
+        Directory rootDirectory = GetRootDirectory(currentItem);
+        
+         // se verifica si  hay directorios para listar
+        if (rootDirectory.nextItems.size() > 0)
+        {
+            
+            System.out.println("Listado de rutas de directorios para el volumen MIDOS\n" +
+                                "El número de serie del volumen es: Carlos Castro Brenes 1-1596-0319\n" +
+                                "M:\\\n");
+            
+            PrintDirectory(rootDirectory, " ");
+            
+        }
+        else
+        {
+           // enc caso contrario indicamos que no se han encontrado directorios
+            System.out.println("Aún no hay archivos agregados");
         }
     }
     

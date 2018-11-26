@@ -11,5 +11,5 @@ package mingosoft.midos;
  */
 public enum COMMAND_TYPE 
 {
-    DEFAULT, CLS, VER, DATE, TIME, EXIT, MD, DIR, RD, CD, PROMPT, COPY_CON, TYPE, DEL, REN
+    DEFAULT, CLS, VER, DATE, TIME, EXIT, MD, DIR, RD, CD, PROMPT, COPY_CON, TYPE, DEL, REN, TREE
 }
